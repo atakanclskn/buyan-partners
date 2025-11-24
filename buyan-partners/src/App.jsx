@@ -1,5 +1,6 @@
 import { useSite } from './context/SiteContext';
 import Services from './components/Services';
+import About from './components/About';
 
 function App() {
   const { config } = useSite(); // Verileri çekiyoruz
@@ -51,6 +52,7 @@ function App() {
 
       </header>
       <Services />
+      <About />
     </div>
 
   )
