@@ -1,6 +1,6 @@
 import { useSite } from '../context/SiteContext';
 import * as Icons from 'lucide-react'; // Tüm ikonları çektik
-
+import Reveal from './Reveal';
 // İkon isminden (string) bileşene çeviren yardımcı fonksiyon
 const DynamicIcon = ({ name }) => {
   const IconComponent = Icons[name];
@@ -15,7 +15,7 @@ const Services = () => {
   return (
     <section id="services" className="py-24 bg-white">
       <div className="container mx-auto px-6">
-        
+        <Reveal>
         {/* Bölüm Başlığı */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -25,7 +25,8 @@ const Services = () => {
             {services.subtitle}
           </p>
         </div>
-
+        </Reveal>
+        <Reveal>
         {/* Hizmet Kartları Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {services.items.map((item) => (
@@ -48,6 +49,7 @@ const Services = () => {
             </div>
           ))}
         </div>
+        </Reveal>
 
       </div>
     </section>

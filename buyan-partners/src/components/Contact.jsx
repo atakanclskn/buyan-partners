@@ -1,5 +1,6 @@
 import { useSite } from '../context/SiteContext';
 import { Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
+import Reveal from './Reveal';
 
 const Contact = () => {
   const { config } = useSite();
@@ -8,7 +9,7 @@ const Contact = () => {
   return (
     <section id="contact" className="py-24 bg-white">
       <div className="container mx-auto px-6">
-        
+        <Reveal>
         <div className="grid grid-cols-1 lg:grid-cols-3 rounded-3xl overflow-hidden shadow-2xl">
           
           {/* SOL TARAFI: İletişim Bilgileri (Koyu Zemin) */}
@@ -91,6 +92,7 @@ const Contact = () => {
           </div>
 
         </div>
+        </Reveal>
       </div>
     </section>
   );

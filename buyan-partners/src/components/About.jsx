@@ -1,4 +1,5 @@
 import { useSite } from '../context/SiteContext';
+import Reveal from './Reveal';
 
 const About = () => {
   const { config } = useSite();
@@ -7,7 +8,7 @@ const About = () => {
   return (
     <section id="about" className="py-24 bg-gray-50 overflow-hidden">
       <div className="container mx-auto px-6">
-        
+        <Reveal>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           
           {/* SOL TARA: GÖRSEL */}
@@ -62,6 +63,7 @@ const About = () => {
           </div>
 
         </div>
+        </Reveal>
       </div>
     </section>
   );
