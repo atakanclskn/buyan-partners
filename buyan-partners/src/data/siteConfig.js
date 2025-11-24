@@ -87,7 +87,7 @@ export const siteConfig = {
   contact: {
     title: "Bir Kahve İçelim?",
     subtitle: "Projeleriniz hakkında konuşmak ve size nasıl değer katabileceğimizi tartışmak için sabırsızlanıyoruz.",
-    buttonText: "Mesaj Gönder",
+    buttonText: "E-Mail Gönder",
     info: {
       email: "info@buyanpartners.com",
       phone: "+90 (212) 555 00 00",

@@ -27,7 +27,6 @@ function App() {
 
         <div className="relative z-10 text-center max-w-4xl px-4">
           <Reveal>
-            {" "}
             {/* Hero yazıları da animasyonlu gelsin */}
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
               {config.hero.title}
@@ -35,8 +34,11 @@ function App() {
             <p className="text-xl md:text-2xl text-gray-200 mb-10 font-light">
               {config.hero.subtitle}
             </p>
-            <button className="bg-secondary text-white px-8 py-4 rounded-full font-semibold text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-secondary/50 cursor-pointer">
+            <button 
+            onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
+            className="bg-secondary text-white px-8 py-4 rounded-full font-semibold text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-secondary/50 cursor-pointer">
               {config.hero.buttonText}
+              
             </button>
           </Reveal>
         </div>

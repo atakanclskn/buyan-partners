@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
-// DÜZELTME: Tüm ikonları tek satırda çağırıyoruz
 import { Menu, X, Moon, Sun } from 'lucide-react'; 
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
-  // Context'ten darkMode verilerini de çektik
   const { config, darkMode, setDarkMode } = useSite();
   const { navigation, general } = config;
   
@@ -29,7 +27,7 @@ const Navbar = () => {
     }
   }, [isMobileMenuOpen]);
 
-  // Animasyon Ayarları
+  // Menü Animasyon Ayarları
   const containerVars = {
     initial: { transition: { staggerChildren: 0.09, staggerDirection: -1 } },
     open: { transition: { delayChildren: 0.3, staggerChildren: 0.09, staggerDirection: 1 } }
@@ -42,6 +40,7 @@ const Navbar = () => {
 
   return (
     <>
+      {/* --- ANA NAVBAR --- */}
       <nav 
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           isScrolled 
@@ -73,24 +72,39 @@ const Navbar = () => {
               </a>
             ))}
 
-            {/* --- DARK MODE BUTONU (MASAÜSTÜ) --- */}
+            {/* --- ANİMASYONLU DARK MODE BUTONU (MASAÜSTÜ) --- */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="ml-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer border border-white/5"
+              className="ml-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer border border-white/5 overflow-hidden"
               title={darkMode ? "Aydınlık Moda Geç" : "Karanlık Moda Geç"}
             >
-              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+              {/* ANİMASYON BURADA: key={darkMode} sayesinde ikon her değiştiğinde animasyon baştan oynar */}
+              <motion.div
+                key={darkMode} 
+                initial={{ rotate: -180, scale: 0, opacity: 0 }}
+                animate={{ rotate: 0, scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 10 }}
+              >
+                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+              </motion.div>
             </button>
           </div>
 
           {/* MOBİL HAMBURGER BUTONU */}
           <div className="md:hidden z-50 relative flex items-center gap-4">
-            {/* Mobilde de Dark Mode butonu olsun */}
+            {/* Mobilde de Animasyonlu Buton */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-full bg-black/20 text-white"
+              className="p-2 rounded-full bg-black/20 text-white border border-white/10"
             >
-              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+               <motion.div
+                key={darkMode}
+                initial={{ rotate: -180, scale: 0, opacity: 0 }}
+                animate={{ rotate: 0, scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 10 }}
+              >
+                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+              </motion.div>
             </button>
 
             <button 
