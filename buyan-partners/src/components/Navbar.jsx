@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
-import { Menu, X } from 'lucide-react'; // Hamburger ve Kapat ikonları
+import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
   const { config } = useSite();
@@ -9,10 +9,8 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Scroll olayını dinle
   useEffect(() => {
     const handleScroll = () => {
-      // 50px'den fazla aşağı inildiyse header'ı koyulaştır
       setIsScrolled(window.scrollY > 50);
     };
 
@@ -20,64 +18,105 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Menü açılınca arkadaki sayfayı kilitle (Scroll olmasın)
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [isMobileMenuOpen]);
+
   return (
-    <nav 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled || isMobileMenuOpen 
-          ? 'bg-primary/95 backdrop-blur-md shadow-lg py-4' // Aşağı inince veya menü açıkken
-          : 'bg-transparent py-6' // En tepedeyken şeffaf
-      }`}
-    >
-      <div className="container mx-auto px-6 flex justify-between items-center">
-        
-        {/* Logo */}
-        <div className="text-2xl font-bold text-white cursor-pointer z-50 relative">
-           <a href="/">{general.logoText}</a>
-        </div>
+    <>
+      {/* --- ANA NAVBAR ÇUBUĞU --- */}
+      <nav 
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+          isScrolled 
+            ? 'backdrop-blur-md shadow-lg py-4' 
+            : 'bg-transparent py-6'
+        }`}
+        // Navbar arka plan rengini de garantiye alalım (Scrolled ise)
+        style={{ 
+          backgroundColor: isScrolled ? 'var(--color-primary)' : 'transparent',
+          opacity: isScrolled ? 0.95 : 1 
+        }}
+      >
+        <div className="container mx-auto px-6 flex justify-between items-center">
+          
+          {/* Logo */}
+          <div className="text-2xl font-bold text-white cursor-pointer z-50 relative">
+             <a href="/">{general.logoText}</a>
+          </div>
 
-        {/* Masaüstü Menü (Sadece büyük ekranlarda görünür) */}
-        <div className="hidden md:flex space-x-8 text-white/90 font-medium">
-          {navigation.map((item) => (
-            <a 
-              key={item.id} 
-              href={item.path} 
-              className="hover:text-secondary transition-colors relative group"
+          {/* Masaüstü Linkler */}
+          <div className="hidden md:flex space-x-8 text-white/90 font-medium">
+            {navigation.map((item) => (
+              <a 
+                key={item.id} 
+                href={item.path} 
+                className="hover:text-secondary transition-colors relative group"
+              >
+                {item.title}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
+              </a>
+            ))}
+          </div>
+
+          {/* Mobil Hamburger Butonu */}
+          <div className="md:hidden z-50 relative">
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)} 
+              className="text-white hover:text-secondary transition-colors cursor-pointer"
             >
-              {item.title}
-              {/* Hover Çizgisi */}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
-            </a>
-          ))}
-        </div>
+              <Menu size={30} />
+            </button>
+          </div>
 
-        {/* Mobil Hamburger Butonu (Sadece küçük ekranlarda görünür) */}
-        <div className="md:hidden z-50 relative">
-          <button 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-            className="text-white hover:text-secondary transition-colors cursor-pointer"
-          >
-            {isMobileMenuOpen ? <X size={30} /> : <Menu size={30} />}
-          </button>
         </div>
+      </nav>
 
-        {/* Mobil Menü Overlay (Tam Ekran) */}
-        {isMobileMenuOpen && (
-          <div className="fixed inset-0 bg-primary z-40 flex flex-col items-center justify-center space-y-8 md:hidden">
+      {/* --- MOBİL MENÜ OVERLAY (DÜZELTİLEN KISIM) --- */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-[9999] h-screen w-screen flex flex-col"
+          // İŞTE ÇÖZÜM BURADA: Rengi doğrudan değişkenden alıp zorluyoruz.
+          style={{ backgroundColor: 'var(--color-primary)' }} 
+        >
+          
+          {/* Mobil Menü Üst Kısım (Logo ve Kapat) */}
+          <div className="flex justify-between items-center p-6 border-b border-white/10">
+            <span className="text-2xl font-bold text-white">{general.logoText}</span>
+            <button 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-white hover:text-secondary transition-colors p-2 bg-white/10 rounded-full cursor-pointer"
+            >
+              <X size={30} />
+            </button>
+          </div>
+
+          {/* Mobil Linkler */}
+          <div className="flex flex-col items-center justify-center flex-grow space-y-8">
             {navigation.map((item) => (
               <a 
                 key={item.id} 
                 href={item.path}
-                onClick={() => setIsMobileMenuOpen(false)} // Tıklayınca menüyü kapat
-                className="text-2xl font-bold text-white hover:text-secondary transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-3xl font-bold text-white hover:text-secondary transition-colors tracking-wide"
               >
                 {item.title}
               </a>
             ))}
           </div>
-        )}
 
-      </div>
-    </nav>
+          {/* Alt Bilgi */}
+          <div className="p-6 text-center text-white/30 text-sm pb-12">
+            {config.general.siteName}
+          </div>
+
+        </div>
+      )}
+    </>
   );
 };
 
