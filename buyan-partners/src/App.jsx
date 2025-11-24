@@ -1,6 +1,7 @@
 import { useSite } from './context/SiteContext';
 import Services from './components/Services';
 import About from './components/About';
+import Contact from './components/Contact';
 
 function App() {
   const { config } = useSite(); // Verileri çekiyoruz
@@ -49,10 +50,10 @@ function App() {
             {config.hero.buttonText}
           </button>
         </div>
-
       </header>
       <Services />
       <About />
+      <Contact />
     </div>
 
   )

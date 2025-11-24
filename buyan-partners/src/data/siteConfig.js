@@ -82,5 +82,17 @@ export const siteConfig = {
       { value: "50M$", label: "Yönetilen Portföy" }
     ],
     image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80" // Toplantı yapan insanlar
+  },
+  // İLETİŞİM VERİSİ
+  contact: {
+    title: "Bir Kahve İçelim?",
+    subtitle: "Projeleriniz hakkında konuşmak ve size nasıl değer katabileceğimizi tartışmak için sabırsızlanıyoruz.",
+    buttonText: "Mesaj Gönder",
+    info: {
+      email: "info@buyanpartners.com",
+      phone: "+90 (212) 555 00 00",
+      address: "Levent Mah. Büyükdere Cad. No:199, Şişli/İstanbul",
+      mapUrl: "https://maps.google.com" // İleride harita linki için
+    }
   }
 };
