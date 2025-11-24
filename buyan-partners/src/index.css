@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
+/* v4'te Dark Mode'un class tabanlı çalışmasını garantiye alıyoruz */
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-primary: var(--color-primary);
   --color-secondary: var(--color-secondary);
   --color-bg: var(--color-bg);
   --color-text: var(--color-text);
+}
+
+/* Sayfa geçişlerinde göz yorulmasın diye yumuşak geçiş ekleyelim */
+html {
+  transition: background-color 0.3s, color 0.3s;
 }

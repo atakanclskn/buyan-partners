@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
-import { Menu, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion'; // Animasyon kütüphanesini çağırdık
+// DÜZELTME: Tüm ikonları tek satırda çağırıyoruz
+import { Menu, X, Moon, Sun } from 'lucide-react'; 
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
-  const { config } = useSite();
+  // Context'ten darkMode verilerini de çektik
+  const { config, darkMode, setDarkMode } = useSite();
   const { navigation, general } = config;
   
   const [isScrolled, setIsScrolled] = useState(false);
@@ -27,7 +29,7 @@ const Navbar = () => {
     }
   }, [isMobileMenuOpen]);
 
-  // Linkler için animasyon ayarları (Sırayla gelme efekti)
+  // Animasyon Ayarları
   const containerVars = {
     initial: { transition: { staggerChildren: 0.09, staggerDirection: -1 } },
     open: { transition: { delayChildren: 0.3, staggerChildren: 0.09, staggerDirection: 1 } }
@@ -40,7 +42,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* --- ANA NAVBAR --- */}
       <nav 
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           isScrolled 
@@ -53,11 +54,14 @@ const Navbar = () => {
         }}
       >
         <div className="container mx-auto px-6 flex justify-between items-center">
+          
+          {/* LOGO */}
           <div className="text-2xl font-bold text-white cursor-pointer z-50 relative">
              <a href="/">{general.logoText}</a>
           </div>
 
-          <div className="hidden md:flex space-x-8 text-white/90 font-medium">
+          {/* MASAÜSTÜ MENÜ */}
+          <div className="hidden md:flex items-center space-x-8 text-white/90 font-medium">
             {navigation.map((item) => (
               <a 
                 key={item.id} 
@@ -68,9 +72,27 @@ const Navbar = () => {
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
               </a>
             ))}
+
+            {/* --- DARK MODE BUTONU (MASAÜSTÜ) --- */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="ml-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer border border-white/5"
+              title={darkMode ? "Aydınlık Moda Geç" : "Karanlık Moda Geç"}
+            >
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
           </div>
 
-          <div className="md:hidden z-50 relative">
+          {/* MOBİL HAMBURGER BUTONU */}
+          <div className="md:hidden z-50 relative flex items-center gap-4">
+            {/* Mobilde de Dark Mode butonu olsun */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 rounded-full bg-black/20 text-white"
+            >
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+
             <button 
               onClick={() => setIsMobileMenuOpen(true)} 
               className="text-white hover:text-secondary transition-colors cursor-pointer"
@@ -81,19 +103,18 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* --- ANİMASYONLU MOBİL MENÜ --- */}
+      {/* MOBİL MENÜ OVERLAY */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div 
-            initial={{ opacity: 0 }} // Başlangıçta görünmez
-            animate={{ opacity: 1 }} // Açılınca görünür
-            exit={{ opacity: 0 }}    // Kapanırken kaybolur
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-[9999] h-screen w-screen flex flex-col"
             style={{ backgroundColor: 'var(--color-primary)' }} 
           >
             
-            {/* Üst Bar */}
             <div className="flex justify-between items-center p-6 border-b border-white/10">
               <span className="text-2xl font-bold text-white">{general.logoText}</span>
               <button 
@@ -104,7 +125,6 @@ const Navbar = () => {
               </button>
             </div>
 
-            {/* Linkler Container */}
             <motion.div 
               variants={containerVars}
               initial="initial"
@@ -126,7 +146,6 @@ const Navbar = () => {
               ))}
             </motion.div>
 
-            {/* Alt Bilgi */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
