@@ -2,6 +2,7 @@ import { useSite } from './context/SiteContext';
 import Services from './components/Services';
 import About from './components/About';
 import Contact from './components/Contact';
+import Footer from './components/Footer';
 
 function App() {
   const { config } = useSite(); // Verileri çekiyoruz
@@ -54,6 +55,7 @@ function App() {
       <Services />
       <About />
       <Contact />
+      <Footer />
     </div>
 
   )

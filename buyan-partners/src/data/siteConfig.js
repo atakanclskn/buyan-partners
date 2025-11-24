@@ -94,5 +94,19 @@ export const siteConfig = {
       address: "Levent Mah. Büyükdere Cad. No:199, Şişli/İstanbul",
       mapUrl: "https://maps.google.com" // İleride harita linki için
     }
+  },
+  // FOOTER VERİSİ
+  footer: {
+    description: "İşletmeler için stratejik büyüme ve dijital dönüşüm ortağınız.",
+    socials: [
+      { id: 1, name: "linkedin", url: "#" },
+      { id: 2, name: "twitter", url: "#" },
+      { id: 3, name: "instagram", url: "#" }
+    ],
+    links: [
+      { title: "Gizlilik Politikası", url: "#" },
+      { title: "Kullanım Şartları", url: "#" },
+      { title: "Çerez Politikası", url: "#" }
+    ]
   }
 };
