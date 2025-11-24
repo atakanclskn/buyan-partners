@@ -12,13 +12,12 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Scroll kilitleme
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -27,148 +26,139 @@ const Navbar = () => {
     }
   }, [isMobileMenuOpen]);
 
-  // Menü Animasyon Ayarları
-  const containerVars = {
-    initial: { transition: { staggerChildren: 0.09, staggerDirection: -1 } },
-    open: { transition: { delayChildren: 0.3, staggerChildren: 0.09, staggerDirection: 1 } }
+  // --- YAY (SPRING) AYARLARI ---
+  const springTransition = {
+    type: "spring",
+    stiffness: 100,
+    damping: 20,
+    mass: 0.5
   };
 
-  const linkVars = {
-    initial: { y: "30vh", transition: { duration: 0.5, ease: [0.37, 0, 0.63, 1] }, opacity: 0 },
-    open: { y: 0, transition: { duration: 0.7, ease: [0, 0.55, 0.45, 1] }, opacity: 1 }
+  const navVariants = {
+    top: {
+      width: "100%",
+      maxWidth: "100%",
+      y: 0,
+      borderRadius: "0px",
+      backgroundColor: "rgba(0,0,0,0)",
+      borderBottom: "1px solid rgba(255,255,255,0)",
+      paddingLeft: "2rem", // Normal padding
+      paddingRight: "2rem",
+      paddingTop: "1.5rem",
+      paddingBottom: "1.5rem",
+      boxShadow: "0 0 0 0 rgba(0,0,0,0)"
+    },
+    scrolled: {
+      width: "85%", // Daralma oranı
+      maxWidth: "1000px",
+      y: 20,
+      borderRadius: "50px",
+      backgroundColor: darkMode ? "rgba(15, 23, 42, 0.85)" : "rgba(255, 255, 255, 0.9)",
+      backdropFilter: "blur(16px)",
+      border: darkMode ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(255,255,255,0.5)",
+      paddingLeft: "1.5rem", // Hafifçe daralıyor
+      paddingRight: "1.5rem",
+      paddingTop: "0.75rem",
+      paddingBottom: "0.75rem",
+      boxShadow: "0 20px 40px -10px rgba(0,0,0,0.1)"
+    }
   };
 
   return (
     <>
-      {/* --- ANA NAVBAR --- */}
-      <nav 
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-          isScrolled 
-            ? 'backdrop-blur-md shadow-lg py-4' 
-            : 'bg-transparent py-6'
-        }`}
-        style={{ 
-          backgroundColor: isScrolled ? 'var(--color-primary)' : 'transparent',
-          opacity: isScrolled ? 0.95 : 1 
-        }}
+      {/* --- NAVBAR --- */}
+      <motion.nav 
+        variants={navVariants}
+        initial="top"
+        animate={isScrolled ? "scrolled" : "top"}
+        transition={springTransition}
+        className="fixed left-1/2 z-50 flex justify-between items-center w-full box-border"
+        style={{ x: '-50%' }} // Ortalamayı buradan sabitliyoruz
       >
-        <div className="container mx-auto px-6 flex justify-between items-center">
           
-          {/* LOGO */}
-          <div className="text-2xl font-bold text-white cursor-pointer z-50 relative">
-             <a href="/">{general.logoText}</a>
-          </div>
-
-          {/* MASAÜSTÜ MENÜ */}
-          <div className="hidden md:flex items-center space-x-8 text-white/90 font-medium">
-            {navigation.map((item) => (
-              <a 
-                key={item.id} 
-                href={item.path} 
-                className="hover:text-secondary transition-colors relative group"
-              >
-                {item.title}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
-              </a>
-            ))}
-
-            {/* --- ANİMASYONLU DARK MODE BUTONU (MASAÜSTÜ) --- */}
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="ml-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer border border-white/5 overflow-hidden"
-              title={darkMode ? "Aydınlık Moda Geç" : "Karanlık Moda Geç"}
-            >
-              {/* ANİMASYON BURADA: key={darkMode} sayesinde ikon her değiştiğinde animasyon baştan oynar */}
-              <motion.div
-                key={darkMode} 
-                initial={{ rotate: -180, scale: 0, opacity: 0 }}
-                animate={{ rotate: 0, scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 200, damping: 10 }}
-              >
-                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-              </motion.div>
-            </button>
-          </div>
-
-          {/* MOBİL HAMBURGER BUTONU */}
-          <div className="md:hidden z-50 relative flex items-center gap-4">
-            {/* Mobilde de Animasyonlu Buton */}
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-full bg-black/20 text-white border border-white/10"
-            >
-               <motion.div
-                key={darkMode}
-                initial={{ rotate: -180, scale: 0, opacity: 0 }}
-                animate={{ rotate: 0, scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 200, damping: 10 }}
-              >
-                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-              </motion.div>
-            </button>
-
-            <button 
-              onClick={() => setIsMobileMenuOpen(true)} 
-              className="text-white hover:text-secondary transition-colors cursor-pointer"
-            >
-              <Menu size={30} />
-            </button>
-          </div>
+        {/* LOGO (layout prop'unu kaldırdık, artık kaymayacak) */}
+        <div className="text-2xl font-bold cursor-pointer relative shrink-0">
+           <a href="/" className={`${isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'} transition-colors duration-500`}>
+             {general.logoText}
+           </a>
         </div>
-      </nav>
 
-      {/* MOBİL MENÜ OVERLAY */}
+        {/* MASAÜSTÜ MENÜ (layout prop'unu kaldırdık) */}
+        <div className="hidden md:flex items-center space-x-8 font-medium">
+          {navigation.map((item) => (
+            <a 
+              key={item.id} 
+              href={item.path} 
+              className={`relative group transition-colors duration-300
+                ${isScrolled 
+                  ? 'text-gray-700 dark:text-gray-200 hover:text-secondary' 
+                  : 'text-white/90 hover:text-white' 
+                }
+              `}
+            >
+              {item.title}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+          ))}
+
+          {/* DARK MODE BUTONU */}
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className={`ml-4 p-2 rounded-full transition-all cursor-pointer overflow-hidden border
+              ${isScrolled 
+                ? 'bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white' 
+                : 'bg-white/10 border-white/10 text-white hover:bg-white/20'
+              }
+            `}
+          >
+            <motion.div
+              key={darkMode} 
+              initial={{ rotate: -180, scale: 0, opacity: 0 }}
+              animate={{ rotate: 0, scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 10 }}
+            >
+              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </motion.div>
+          </button>
+        </div>
+
+        {/* MOBİL BUTON */}
+        <div className="md:hidden flex items-center gap-4">
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)} 
+            className={`transition-colors cursor-pointer ${isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'}`}
+          >
+            <Menu size={28} />
+          </button>
+        </div>
+
+      </motion.nav>
+
+      {/* MOBİL MENÜ (Aynı) */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[9999] h-screen w-screen flex flex-col"
-            style={{ backgroundColor: 'var(--color-primary)' }} 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[9999] h-screen w-screen flex flex-col bg-white dark:bg-slate-950"
           >
-            
-            <div className="flex justify-between items-center p-6 border-b border-white/10">
-              <span className="text-2xl font-bold text-white">{general.logoText}</span>
-              <button 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-white hover:text-secondary transition-colors p-2 bg-white/10 rounded-full cursor-pointer"
-              >
-                <X size={30} />
-              </button>
+            <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-white/10">
+              <span className="text-2xl font-bold text-gray-900 dark:text-white">{general.logoText}</span>
+              <div className="flex items-center gap-4">
+                 <button onClick={() => setDarkMode(!darkMode)} className="p-2 rounded-full bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white">
+                    {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                  </button>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-900 dark:text-white hover:text-secondary p-2 bg-gray-100 dark:bg-white/10 rounded-full">
+                  <X size={28} />
+                </button>
+              </div>
             </div>
-
-            <motion.div 
-              variants={containerVars}
-              initial="initial"
-              animate="open"
-              exit="initial"
-              className="flex flex-col items-center justify-center flex-grow space-y-8"
-            >
+            <div className="flex flex-col items-center justify-center flex-grow space-y-8">
               {navigation.map((item) => (
-                <div key={item.id} className="overflow-hidden">
-                  <motion.a 
-                    variants={linkVars}
-                    href={item.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block text-4xl font-bold text-white hover:text-secondary transition-colors tracking-wide"
-                  >
-                    {item.title}
-                  </motion.a>
-                </div>
+                <a key={item.id} href={item.path} onClick={() => setIsMobileMenuOpen(false)} className="text-3xl font-bold text-gray-900 dark:text-white hover:text-secondary transition-colors">
+                  {item.title}
+                </a>
               ))}
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="p-6 text-center text-white/30 text-sm pb-12"
-            >
-              {config.general.siteName}
-            </motion.div>
-
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
