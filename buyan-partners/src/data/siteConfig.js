@@ -41,33 +41,28 @@ export const siteConfig = {
     // Geçici olarak internetten rastgele kurumsal bir resim:
     backgroundImage: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80"
   },
+  // HİZMETLER VERİSİ (GÜNCELLENDİ)
   services: {
-    title: "Uzmanlık Alanlarımız",
-    subtitle: "İşletmenizin ihtiyaçlarına özel, veri odaklı çözümler sunuyoruz.",
+    title: "Our Expertise", // Başlığı İngilizce içeriğe uygun güncelledik
+    subtitle: "Tailored solutions for sustainable growth and transformation.",
     items: [
       {
         id: 1,
-        title: "Stratejik Planlama",
-        description: "Uzun vadeli hedeflerinize ulaşmanız için pazar analizi ve yol haritası oluşturuyoruz.",
-        icon: "Map" // Lucide ikon ismi
+        title: "MARKET ENTRY & BUSINESS SETUP",
+        description: "Supporting international and domestic companies entering or expanding in the U.S.",
+        icon: "Globe" // Küresel genişleme ikonu
       },
       {
         id: 2,
-        title: "Yönetim Danışmanlığı",
-        description: "Operasyonel verimliliği artırmak ve maliyetleri optimize etmek için süreçlerinizi yeniden tasarlıyoruz.",
-        icon: "Briefcase"
+        title: "PEOPLE & ORGANIZATION CONSULTING",
+        description: "Building high-performing organizations through modern, strategic HR.",
+        icon: "Users" // İnsan ve ekip ikonu
       },
       {
         id: 3,
-        title: "Dijital Dönüşüm",
-        description: "Modern teknolojileri iş süreçlerinize entegre ederek rekabet avantajı sağlıyoruz.",
-        icon: "Monitor"
-      },
-      {
-        id: 4,
-        title: "Marka Konumlandırma",
-        description: "Markanızın değerini artıracak kurumsal kimlik ve iletişim stratejileri geliştiriyoruz.",
-        icon: "Megaphone"
+        title: "TECHNOLOGY, DATA & TRANSFORMATION",
+        description: "Accelerating digital maturity, AI adoption, and enterprise change.",
+        icon: "BrainCircuit" // Teknoloji ve AI ikonu
       }
     ]
   },
