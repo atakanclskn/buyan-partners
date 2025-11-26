@@ -147,7 +147,7 @@ const Navbar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[9999] h-screen w-screen flex flex-col bg-white dark:bg-slate-950"
+            className="fixed inset-0 z-9999 h-screen w-screen flex flex-col bg-white dark:bg-slate-950"
           >
             <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-white/10">
               <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -168,7 +168,7 @@ const Navbar = () => {
                 </button>
               </div>
             </div>
-            <div className="flex flex-col items-center justify-center flex-grow space-y-8">
+            <div className="flex flex-col items-center justify-center grow space-y-8">
               {navigation.map((item) => (
                 <a
                   key={item.id}
