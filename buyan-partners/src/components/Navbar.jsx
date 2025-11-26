@@ -10,10 +10,16 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+// Scroll Takibi
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      // Eski hali: 20px inince çalışıyordu
+      // Yeni hali: Hero bölümü (ekran boyu - 100px) bitince çalışsın
+      const heroHeight = window.innerHeight - 100; 
+      
+      setIsScrolled(window.scrollY > heroHeight);
     };
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -26,115 +32,99 @@ const Navbar = () => {
     }
   }, [isMobileMenuOpen]);
 
-  // --- YAY (SPRING) AYARLARI ---
-  const springTransition = {
-    type: "spring",
-    stiffness: 100,
-    damping: 20,
-    mass: 0.5
-  };
-
-  const navVariants = {
-    top: {
-      width: "100%",
-      maxWidth: "100%",
-      y: 0,
-      borderRadius: "0px",
-      backgroundColor: "rgba(0,0,0,0)",
-      borderBottom: "1px solid rgba(255,255,255,0)",
-      paddingLeft: "2rem", // Normal padding
-      paddingRight: "2rem",
-      paddingTop: "1.5rem",
-      paddingBottom: "1.5rem",
-      boxShadow: "0 0 0 0 rgba(0,0,0,0)"
-    },
-    scrolled: {
-      width: "85%", // Daralma oranı
-      maxWidth: "1000px",
-      y: 20,
-      borderRadius: "50px",
-      backgroundColor: darkMode ? "rgba(15, 23, 42, 0.85)" : "rgba(255, 255, 255, 0.9)",
-      backdropFilter: "blur(16px)",
-      border: darkMode ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(255,255,255,0.5)",
-      paddingLeft: "1.5rem", // Hafifçe daralıyor
-      paddingRight: "1.5rem",
-      paddingTop: "0.75rem",
-      paddingBottom: "0.75rem",
-      boxShadow: "0 20px 40px -10px rgba(0,0,0,0.1)"
-    }
-  };
-
   return (
     <>
-      {/* --- NAVBAR --- */}
-      <motion.nav 
-        variants={navVariants}
-        initial="top"
-        animate={isScrolled ? "scrolled" : "top"}
-        transition={springTransition}
-        className="fixed left-1/2 z-50 flex justify-between items-center w-full box-border"
-        style={{ x: '-50%' }} // Ortalamayı buradan sabitliyoruz
-      >
-          
-        {/* LOGO (layout prop'unu kaldırdık, artık kaymayacak) */}
-        <div className="text-2xl font-bold cursor-pointer relative shrink-0">
-           <a href="/" className={`${isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'} transition-colors duration-500`}>
-             {general.logoText}
-           </a>
-        </div>
+      {/* --- NAVBAR WRAPPER (KONUMLANDIRICI) --- */}
+      {/* Bu div sabit durur, içindeki motion.div hareket eder. Bu sayede titreme olmaz. */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-300">
+        
+        <motion.nav
+          // ANİMASYON HEDEFLERİ
+          animate={{
+            y: isScrolled ? 20 : 0,           // 20px aşağı kay
+            width: isScrolled ? "85%" : "100%", // Genişliği %85'e düşür
+            maxWidth: isScrolled ? "1000px" : "100%", 
+            borderRadius: isScrolled ? "50px" : "0px",
+            backgroundColor: isScrolled 
+              ? (darkMode ? "rgba(15, 23, 42, 0.85)" : "rgba(255, 255, 255, 0.9)") 
+              : "rgba(0, 0, 0, 0)",
+            backdropFilter: isScrolled ? "blur(16px)" : "blur(0px)",
+            border: isScrolled 
+              ? (darkMode ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(255,255,255,0.5)") 
+              : "1px solid rgba(0,0,0,0)",
+            // Padding de animasyona dahil, böylece içerik akıcı şekilde kayar
+            paddingLeft: isScrolled ? "1.5rem" : "2rem", 
+            paddingRight: isScrolled ? "1.5rem" : "2rem",
+            paddingTop: isScrolled ? "0.75rem" : "1.5rem",
+            paddingBottom: isScrolled ? "0.75rem" : "1.5rem",
+          }}
+          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }} // Çok yumuşak (Cubic Bezier)
+          className="flex justify-between items-center shadow-sm box-border"
+          style={{ 
+            boxShadow: isScrolled ? "0 10px 30px -10px rgba(0,0,0,0.1)" : "none" 
+          }}
+        >
+            
+          {/* LOGO */}
+          <div className="text-2xl font-bold cursor-pointer shrink-0 whitespace-nowrap">
+             <a href="/" className={`${isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'} transition-colors duration-300`}>
+               {general.logoText}
+             </a>
+          </div>
 
-        {/* MASAÜSTÜ MENÜ (layout prop'unu kaldırdık) */}
-        <div className="hidden md:flex items-center space-x-8 font-medium">
-          {navigation.map((item) => (
-            <a 
-              key={item.id} 
-              href={item.path} 
-              className={`relative group transition-colors duration-300
+          {/* MASAÜSTÜ MENÜ */}
+          <div className="hidden md:flex items-center space-x-8 font-medium whitespace-nowrap">
+            {navigation.map((item) => (
+              <a 
+                key={item.id} 
+                href={item.path} 
+                className={`relative group transition-colors duration-300
+                  ${isScrolled 
+                    ? 'text-gray-700 dark:text-gray-200 hover:text-secondary' 
+                    : 'text-white/90 hover:text-white' 
+                  }
+                `}
+              >
+                {item.title}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
+              </a>
+            ))}
+
+            {/* DARK MODE BUTONU */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`ml-4 p-2 rounded-full transition-all cursor-pointer overflow-hidden border
                 ${isScrolled 
-                  ? 'text-gray-700 dark:text-gray-200 hover:text-secondary' 
-                  : 'text-white/90 hover:text-white' 
+                  ? 'bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white' 
+                  : 'bg-white/10 border-white/10 text-white hover:bg-white/20'
                 }
               `}
             >
-              {item.title}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
-            </a>
-          ))}
+              <motion.div
+                key={darkMode} 
+                initial={{ rotate: -180, scale: 0, opacity: 0 }}
+                animate={{ rotate: 0, scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 10 }}
+              >
+                {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+              </motion.div>
+            </button>
+          </div>
 
-          {/* DARK MODE BUTONU */}
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className={`ml-4 p-2 rounded-full transition-all cursor-pointer overflow-hidden border
-              ${isScrolled 
-                ? 'bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white' 
-                : 'bg-white/10 border-white/10 text-white hover:bg-white/20'
-              }
-            `}
-          >
-            <motion.div
-              key={darkMode} 
-              initial={{ rotate: -180, scale: 0, opacity: 0 }}
-              animate={{ rotate: 0, scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 10 }}
+          {/* MOBİL BUTON */}
+          <div className="md:hidden flex items-center gap-4">
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)} 
+              className={`transition-colors cursor-pointer ${isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'}`}
             >
-              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-            </motion.div>
-          </button>
-        </div>
+              <Menu size={28} />
+            </button>
+          </div>
 
-        {/* MOBİL BUTON */}
-        <div className="md:hidden flex items-center gap-4">
-          <button 
-            onClick={() => setIsMobileMenuOpen(true)} 
-            className={`transition-colors cursor-pointer ${isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'}`}
-          >
-            <Menu size={28} />
-          </button>
-        </div>
+        </motion.nav>
+      </div>
 
-      </motion.nav>
-
-      {/* MOBİL MENÜ (Aynı) */}
+      {/* MOBİL MENÜ OVERLAY (Aynı) */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div 
@@ -165,4 +155,5 @@ const Navbar = () => {
     </>
   );
 };
+
 export default Navbar;
