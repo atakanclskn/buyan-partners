@@ -13,10 +13,8 @@ const Navbar = () => {
   // Scroll Takibi
   useEffect(() => {
     const handleScroll = () => {
-      // Eski hali: 20px inince çalışıyordu
-      // Yeni hali: Hero bölümü (ekran boyu - 100px) bitince çalışsın
+      // Hero bölümü (ekran boyu - 100px) bitince tetiklensin
       const heroHeight = window.innerHeight - 100;
-
       setIsScrolled(window.scrollY > heroHeight);
     };
 
@@ -34,14 +32,14 @@ const Navbar = () => {
 
   return (
     <>
-      {/* --- NAVBAR WRAPPER (KONUMLANDIRICI) --- */}
-      {/* Bu div sabit durur, içindeki motion.div hareket eder. Bu sayede titreme olmaz. */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-300">
+      {/* --- NAVBAR WRAPPER --- */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-300 pointer-events-none">
+        
         <motion.nav
           // ANİMASYON HEDEFLERİ
           animate={{
-            y: isScrolled ? 20 : 0, // 20px aşağı kay
-            width: isScrolled ? "85%" : "100%", // Genişliği %85'e düşür
+            y: isScrolled ? 20 : 0,
+            width: isScrolled ? "85%" : "100%",
             maxWidth: isScrolled ? "1000px" : "100%",
             borderRadius: isScrolled ? "50px" : "0px",
             backgroundColor: isScrolled
@@ -55,17 +53,19 @@ const Navbar = () => {
                 ? "1px solid rgba(255,255,255,0.1)"
                 : "1px solid rgba(255,255,255,0.5)"
               : "1px solid rgba(0,0,0,0)",
-            // Padding de animasyona dahil, böylece içerik akıcı şekilde kayar
+            // Padding animasyonu (Su damlası efekti)
             paddingLeft: isScrolled ? "1.5rem" : "2rem",
             paddingRight: isScrolled ? "1.5rem" : "2rem",
             paddingTop: isScrolled ? "0.75rem" : "1.5rem",
             paddingBottom: isScrolled ? "0.75rem" : "1.5rem",
           }}
+          // --- OPTİMİZE EDİLMİŞ GEÇİŞ (Tek fark burası) ---
           transition={{
-            duration: 1.7, // Süreyi 0.5'ten 0.8'e çıkardık (Daha yavaş)
-            ease: [0.22, 1, 0.36, 1], // "Apple-style" Bezier eğrisi (Hızlı başlar, çok yumuşak durur)
+            duration: 1.6, 
+            ease: [0.22, 1, 0.36, 1] // Apple-style Smoothness
           }}
-          className="flex justify-between items-center shadow-sm box-border"
+          // -----------------------------------------------
+          className="flex justify-between items-center shadow-sm box-border w-full pointer-events-auto"
           style={{
             boxShadow: isScrolled
               ? "0 10px 30px -10px rgba(0,0,0,0.1)"
@@ -139,7 +139,7 @@ const Navbar = () => {
         </motion.nav>
       </div>
 
-      {/* MOBİL MENÜ OVERLAY (Aynı) */}
+      {/* MOBİL MENÜ OVERLAY (Değişmedi) */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
