@@ -148,8 +148,17 @@ const Navbar = () => {
                 {/* --- SİHİRLİ ARKA PLAN HAPI --- */}
                 {hoveredTab === item.id && (
                   <motion.span
-                    layoutId="nav-pill" // SİHİR BURADA: Bu ID sayesinde Framer Motion kutuyu birinden diğerine uçurur
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    layoutId="nav-pill"
+                    
+                    // YENİ EKLENEN KISIM: GİRİŞ ANİMASYONU
+                    initial={{ opacity: 0, scale: 0.8 }} // Başlarken: Görünmez ve %80 boyutunda
+                    animate={{ opacity: 1, scale: 1 }}   // Biterken: Tam görünür ve %100 boyutunda
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 300, 
+                      damping: 30 
+                    }}
+                    
                     className="absolute inset-0 rounded-full bg-gray-200/50 dark:bg-white/10 backdrop-blur-sm -z-0"
                   />
                 )}
