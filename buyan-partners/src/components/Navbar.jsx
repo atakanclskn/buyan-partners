@@ -8,8 +8,9 @@ const Navbar = () => {
   const { navigation, general } = config;
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hoveredTab, setHoveredTab] = useState(null); // YENİ: Hangi linkin üzerindeyiz?
 
-  // --- SCROLL PROGRESS AYARLARI ---
+  // --- SCROLL PROGRESS ---
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -17,7 +18,6 @@ const Navbar = () => {
     restDelta: 0.001
   });
 
-  // --- SCROLL DURUMU TAKİBİ ---
   const [isScrolled, setIsScrolled] = useState(() => {
     if (typeof window !== "undefined") {
       return window.scrollY > (window.innerHeight - 100);
@@ -32,7 +32,7 @@ const Navbar = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // İlk yüklemede kontrol et
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -50,7 +50,7 @@ const Navbar = () => {
     }
   };
 
-  // --- STİL AYARLARI (CAM EFEKTİ) ---
+  // Stil Ayarları
   const glassStyle = {
     backgroundColor: isScrolled || isMobileMenuOpen
       ? darkMode
@@ -67,16 +67,13 @@ const Navbar = () => {
       : "rgba(255,255,255,0.05)",
   };
 
-  // Genişlik ve Radius Hesaplamaları
   const currentWidth = (isScrolled || isMobileMenuOpen) ? "90%" : "100%";
   const maxWidth = (isScrolled || isMobileMenuOpen) ? "1000px" : "100%";
-  
-  // Menü açıkken alt köşeler düzleşsin (Birleşme efekti için)
   const topBarRadius = isMobileMenuOpen 
     ? "24px 24px 0px 0px" 
     : (isScrolled ? "50px" : "0px");
 
-  // --- ANİMASYON VARYANTLARI ---
+  // Animasyonlar
   const menuVariants = {
     closed: { opacity: 0, y: -20, transition: { duration: 0.2, ease: "easeInOut" } },
     open: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30, staggerChildren: 0.1, delayChildren: 0.1 } }
@@ -91,7 +88,7 @@ const Navbar = () => {
     <>
       <div className="fixed top-0 left-0 right-0 z-50 flex flex-col items-center pointer-events-none">
         
-        {/* --- 1. ANA NAVBAR --- */}
+        {/* --- ANA NAVBAR --- */}
         <motion.nav
           initial={false}
           animate={{
@@ -114,7 +111,7 @@ const Navbar = () => {
           className="flex justify-between items-center shadow-lg box-border w-full pointer-events-auto z-50 relative overflow-hidden"
         >
           {/* LOGO */}
-          <div className="text-2xl font-bold cursor-pointer shrink-0 whitespace-nowrap">
+          <div className="text-2xl font-bold cursor-pointer shrink-0 whitespace-nowrap z-10">
             <a
               href="/"
               onClick={handleScrollToTop}
@@ -126,33 +123,43 @@ const Navbar = () => {
             </a>
           </div>
 
-          {/* --- MASAÜSTÜ MENÜ (YENİ HOVER EFEKTİ BURADA) --- */}
-          <div className="hidden md:flex items-center space-x-8 font-medium whitespace-nowrap">
+          {/* --- MASAÜSTÜ MENÜ (YENİ KAYAN HAP EFEKTİ) --- */}
+          <div className="hidden md:flex items-center space-x-2 font-medium whitespace-nowrap z-10" 
+               onMouseLeave={() => setHoveredTab(null)}> {/* Menüden çıkınca hap kaybolsun */}
+            
             {navigation.map((item) => (
               <a
                 key={item.id}
                 href={item.path}
                 onClick={(e) => handleLinkClick(e, item.path)}
-                className={`relative group py-2 transition-colors duration-300
+                onMouseEnter={() => setHoveredTab(item.id)} // Üzerine gelince ID'yi set et
+                className={`relative px-4 py-2 rounded-full transition-colors duration-300
                   ${
+                    // Yazı rengi ayarı
                     isScrolled
-                      ? "text-gray-700 dark:text-gray-200 hover:text-secondary"
-                      : "text-white/90 hover:text-white"
+                      ? "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                      : "text-white/80 hover:text-white"
                   }
                 `}
               >
-                {item.title}
-                
-                {/* YENİ PREMIUM UNDERLINE EFEKTİ */}
-                {/* Ortadan açılan (scale-x), yuvarlak uçlu, hafif gölgeli çizgi */}
-                <span className="absolute bottom-0 left-0 w-full h-[2px] bg-secondary rounded-full origin-center scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span>
+                {/* Metin (Z-Index ile en üstte) */}
+                <span className="relative z-10">{item.title}</span>
+
+                {/* --- SİHİRLİ ARKA PLAN HAPI --- */}
+                {hoveredTab === item.id && (
+                  <motion.span
+                    layoutId="nav-pill" // SİHİR BURADA: Bu ID sayesinde Framer Motion kutuyu birinden diğerine uçurur
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    className="absolute inset-0 rounded-full bg-gray-200/50 dark:bg-white/10 backdrop-blur-sm -z-0"
+                  />
+                )}
               </a>
             ))}
 
-            {/* DARK MODE BUTONU */}
+            {/* DARK MODE */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className={`ml-4 p-2 rounded-full transition-all cursor-pointer overflow-hidden border
+              className={`ml-2 p-2 rounded-full transition-all cursor-pointer overflow-hidden border
                 ${
                   isScrolled
                     ? "bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white"
@@ -172,7 +179,7 @@ const Navbar = () => {
           </div>
 
           {/* MOBİL BUTONLAR */}
-          <div className="md:hidden flex items-center gap-4">
+          <div className="md:hidden flex items-center gap-4 z-10">
              <button
               onClick={() => setDarkMode(!darkMode)}
               className={`p-2 rounded-full transition-all cursor-pointer overflow-hidden border
@@ -196,8 +203,7 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* --- SCROLL PROGRESS BAR --- */}
-          {/* Light: Mavi (Secondary) | Dark: Beyaz */}
+          {/* SCROLL BAR */}
           <motion.div
             style={{ scaleX }}
             className="absolute bottom-0 left-0 right-0 h-[2px] bg-secondary dark:bg-white origin-left z-50"
@@ -205,7 +211,7 @@ const Navbar = () => {
 
         </motion.nav>
 
-        {/* --- 2. MOBİL MENÜ (AÇILIR KART) --- */}
+        {/* --- MOBİL MENÜ --- */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
@@ -220,11 +226,9 @@ const Navbar = () => {
                 borderWidth: "1px",
                 borderStyle: "solid",
                 borderColor: glassStyle.borderColor,
-                
-                borderTop: "none", // Navbar ile birleşsin
-                borderRadius: "0px 0px 24px 24px", // Altlar yuvarlak
+                borderTop: "none",
+                borderRadius: "0px 0px 24px 24px", 
                 marginTop: "-1px", 
-                
                 width: currentWidth,
                 maxWidth: maxWidth,
               }}
