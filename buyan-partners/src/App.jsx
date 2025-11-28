@@ -5,9 +5,8 @@ import About from "./components/About";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import Reveal from "./components/Reveal"; 
-// EKSİK OLAN İMPORTLAR EKLENDİ:
 import Founders from "./components/Founders"; 
-import Brands from "./components/Brands"; 
+//import Brands from "./components/Brands"; 
 
 function App() {
   const { config } = useSite();
@@ -48,7 +47,7 @@ function App() {
 
       {/* SIRALAMA DÜZELTİLDİ */}
       <Founders /> {/* Yeni eklediğimiz Liderlik kısmı */}
-      <Brands />   {/* Markalar şeridi */}
+      {/* <Brands />  */}
       <Services /> {/* Hizmetler */}
       <About />    {/* Hakkımızda */}
       <Contact />  {/* İletişim */}
