@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSite } from "../context/SiteContext";
-import { Menu, X, Moon, Sun } from "lucide-react";
+import { Menu, X, Moon, Sun, ArrowRight } from "lucide-react"; // ArrowRight eklendi
 import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
@@ -9,9 +9,7 @@ const Navbar = () => {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // --- KRİTİK DÜZELTME 1: STATE BAŞLANGICI ---
-  // Varsayılan olarak 'false' demek yerine, o anki konumu kontrol ederek başlıyoruz.
-  // Böylece sayfa yenilendiğinde veya Preloader bittiğinde Navbar "şaşırmaz".
+  // Başlangıç scroll durumunu kontrol et
   const [isScrolled, setIsScrolled] = useState(() => {
     if (typeof window !== "undefined") {
       return window.scrollY > (window.innerHeight - 100);
@@ -19,7 +17,7 @@ const Navbar = () => {
     return false;
   });
 
-  // Scroll Takibi (Değişiklikleri yakalamak için)
+  // Scroll Takibi
   useEffect(() => {
     const handleScroll = () => {
       const heroHeight = window.innerHeight - 100;
@@ -27,13 +25,11 @@ const Navbar = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    // İlk açılışta da bir kez tetikleyelim ki garanti olsun
-    handleScroll();
-    
+    handleScroll(); // İlk yüklemede kontrol
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Mobil Menü Kilidi
+  // Mobil Menü Açılınca Scroll Kilidi (İsteğe bağlı, bu tasarımda kilitlemeye gerek kalmayabilir ama güvenli)
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -42,7 +38,6 @@ const Navbar = () => {
     }
   }, [isMobileMenuOpen]);
 
-  // Yumuşak Scroll
   const handleScrollToTop = (e) => {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -57,47 +52,43 @@ const Navbar = () => {
     }
   };
 
+  // --- STİL AYARLARI (NAVBAR & MOBİL MENÜ ORTAK) ---
+  const glassStyle = {
+    backgroundColor: isScrolled
+      ? darkMode
+        ? "rgba(15, 23, 42, 0.85)" // Dark Scrolled
+        : "rgba(255, 255, 255, 0.9)" // Light Scrolled
+      : darkMode 
+        ? "rgba(0, 0, 0, 0.6)" // Dark Top (Biraz daha belirgin olsun diye)
+        : "rgba(255, 255, 255, 0.1)", // Light Top (Şeffaf)
+    backdropFilter: "blur(16px)",
+    border: isScrolled
+      ? darkMode
+        ? "1px solid rgba(255,255,255,0.1)"
+        : "1px solid rgba(255,255,255,0.5)"
+      : "1px solid rgba(255,255,255,0.05)", // Tepedeyken hafif sınır
+  };
+
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-300 pointer-events-none">
+      <div className="fixed top-0 left-0 right-0 z-50 flex flex-col items-center transition-all duration-300 pointer-events-none">
         
+        {/* --- ANA NAVBAR --- */}
         <motion.nav
-          // --- KRİTİK DÜZELTME 2: INITIAL FALSE ---
-          // Bu ayar, bileşen ilk ekrana geldiğinde animasyon oynatmasını engeller.
-          // Direkt olarak 'animate' içindeki doğru değerlerle başlar.
-          initial={false} 
-          
+          initial={false}
           animate={{
             y: isScrolled ? 20 : 0,
             width: isScrolled ? "85%" : "100%",
             maxWidth: isScrolled ? "1000px" : "100%",
             borderRadius: isScrolled ? "50px" : "0px",
-            backgroundColor: isScrolled
-              ? darkMode
-                ? "rgba(15, 23, 42, 0.85)"
-                : "rgba(255, 255, 255, 0.9)"
-              : "rgba(0, 0, 0, 0)",
-            backdropFilter: isScrolled ? "blur(16px)" : "blur(0px)",
-            border: isScrolled
-              ? darkMode
-                ? "1px solid rgba(255,255,255,0.1)"
-                : "1px solid rgba(255,255,255,0.5)"
-              : "1px solid rgba(0,0,0,0)",
             paddingLeft: isScrolled ? "1.5rem" : "2rem",
             paddingRight: isScrolled ? "1.5rem" : "2rem",
             paddingTop: isScrolled ? "0.75rem" : "1.5rem",
             paddingBottom: isScrolled ? "0.75rem" : "1.5rem",
           }}
-          transition={{
-            duration: 1.6, 
-            ease: [0.22, 1, 0.36, 1]
-          }}
-          className="flex justify-between items-center shadow-sm box-border w-full pointer-events-auto"
-          style={{
-            boxShadow: isScrolled
-              ? "0 10px 30px -10px rgba(0,0,0,0.1)"
-              : "none",
-          }}
+          transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+          className="flex justify-between items-center shadow-lg box-border w-full pointer-events-auto z-50"
+          style={glassStyle} // Ortak stil kullanıldı
         >
           {/* LOGO */}
           <div className="text-2xl font-bold cursor-pointer shrink-0 whitespace-nowrap">
@@ -105,7 +96,7 @@ const Navbar = () => {
               href="/"
               onClick={handleScrollToTop}
               className={`${
-                isScrolled ? "text-gray-900 dark:text-white" : "text-white"
+                isScrolled || isMobileMenuOpen ? "text-gray-900 dark:text-white" : "text-white"
               } transition-colors duration-300`}
             >
               {general.logoText}
@@ -154,64 +145,77 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* MOBİL BUTON */}
+          {/* MOBİL BUTONLAR (SAĞ TARAFA YASLI) */}
           <div className="md:hidden flex items-center gap-4">
+             {/* Dark Mode Butonu (Mobil için buraya da ekledik) */}
+             <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`p-2 rounded-full transition-all cursor-pointer overflow-hidden border
+                ${
+                  isScrolled || isMobileMenuOpen
+                    ? "bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white"
+                    : "bg-white/10 border-white/10 text-white hover:bg-white/20"
+                }
+              `}
+            >
+              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
+            {/* Hamburger Menü Butonu */}
             <button
-              onClick={() => setIsMobileMenuOpen(true)}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={`transition-colors cursor-pointer ${
-                isScrolled ? "text-gray-900 dark:text-white" : "text-white"
+                isScrolled || isMobileMenuOpen ? "text-gray-900 dark:text-white" : "text-white"
               }`}
             >
-              <Menu size={28} />
+              {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
         </motion.nav>
-      </div>
 
-      {/* MOBİL MENÜ OVERLAY */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[9999] h-screen w-screen flex flex-col bg-white dark:bg-slate-950"
-          >
-            <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-white/10">
-              <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                {general.logoText}
-              </span>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setDarkMode(!darkMode)}
-                  className="p-2 rounded-full bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white"
-                >
-                  {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-                </button>
-                <button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-gray-900 dark:text-white hover:text-secondary p-2 bg-gray-100 dark:bg-white/10 rounded-full"
-                >
-                  <X size={28} />
-                </button>
+        {/* --- YENİ MOBİL MENÜ (DROPDOWN GLASS) --- */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, height: 0 }}
+              animate={{ 
+                opacity: 1, 
+                y: isScrolled ? 30 : 0, // Scrolled ise biraz boşluk bırak
+                height: "auto",
+                // Genişlik ve Border Radius ana navbar ile senkronize
+                width: isScrolled ? "85%" : "100%",
+                maxWidth: isScrolled ? "1000px" : "100%",
+                borderRadius: isScrolled ? "30px" : "0px",
+              }}
+              exit={{ opacity: 0, y: -20, height: 0 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              
+              className="pointer-events-auto overflow-hidden shadow-2xl mt-2 md:hidden absolute top-full"
+              style={{
+                ...glassStyle, // Ana navbar ile aynı cam efekti
+                zIndex: 40
+              }}
+            >
+              <div className="p-6 flex flex-col space-y-4">
+                {navigation.map((item) => (
+                  <a
+                    key={item.id}
+                    href={item.path}
+                    onClick={(e) => handleLinkClick(e, item.path)}
+                    className="flex items-center justify-between group p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                  >
+                    <span className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-secondary transition-colors">
+                      {item.title}
+                    </span>
+                    <ArrowRight size={20} className="text-gray-400 group-hover:text-secondary -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
+                  </a>
+                ))}
               </div>
-            </div>
-            <div className="flex flex-col items-center justify-center flex-grow space-y-8">
-              {navigation.map((item) => (
-                <a
-                  key={item.id}
-                  href={item.path}
-                  onClick={(e) => handleLinkClick(e, item.path)}
-                  className="text-3xl font-bold text-gray-900 dark:text-white hover:text-secondary transition-colors"
-                >
-                  {item.title}
-                </a>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+      </div>
     </>
   );
 };
