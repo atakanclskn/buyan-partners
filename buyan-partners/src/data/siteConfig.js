@@ -41,6 +41,30 @@ export const siteConfig = {
     backgroundImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80"
   },
 
+  // FOUNDERS / LEADERSHIP TEAM (YENİ EKLENDİ)
+  founders: {
+    title: "Meet Our Leadership",
+    subtitle: "Visionary leaders guiding global success.",
+    items: [
+      {
+        id: 1,
+        name: "Oya Buyan",
+        title: "Managing Partner",
+        [cite_start]bio: "A seasoned strategist with extensive experience in international business development and organizational transformation. She specializes in guiding companies through complex market entries and building high-performance cultures. [cite: 2, 4]",
+        image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800", // Siyah-Beyaz sample kadın fotoğrafı
+        linkedin: "#"
+      },
+      {
+        id: 2,
+        name: "Teoman Buyan",
+        title: "Managing Partner",
+        bio: "An expert in digital transformation and operational excellence, leveraging technology and data to drive sustainable growth. [cite_start]His focus includes enterprise AI adoption, ERP optimization, and workforce digital capability. [cite: 41, 42, 56]",
+        image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=800", // Siyah-Beyaz sample erkek fotoğrafı
+        linkedin: "#"
+      }
+    ]
+  },
+
   // BRANDS / REFERENCES
   brands: {
     title: "Trusted By Industry Leaders",

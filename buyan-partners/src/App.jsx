@@ -43,6 +43,8 @@ function App() {
           </Reveal>
         </div>
       </header>
+      <Founders />
+      <Brands />
       <Services />
       <About />
       <Contact />
