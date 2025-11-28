@@ -48,18 +48,18 @@ export const siteConfig = {
     items: [
       {
         id: 1,
-        name: "FULL NAME",
-        title: "Managing Partner",
-        bio: " xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx.",
-        image: "", 
+        name: "OYA BUYAN",
+        title: "title",
+        bio: "xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx.",
+        image: "https://images.freeimages.com/images/premium/previews/1648/16483065-blonde-business-woman.jpg", 
         linkedin: "#"
       },
       {
         id: 2,
-        name: "FULL NAME",
-        title: "Managing Partner",
-        bio: "Executive biography will be placed here. An expert in digital transformation and operational excellence, leveraging technology and data to drive sustainable growth. Focus includes enterprise AI adoption, ERP optimization, and workforce digital capability. xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx.",
-        image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=1200",
+        name: "TEOMAN BUYAN",
+        title: "title",
+        bio: "xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx.",
+        image: "https://media.istockphoto.com/id/515908155/photo/businessman.jpg?s=1024x1024&w=is&k=20&c=HYIpv4I5VrpSsS9dR5KF3YkV2534GsdS2JVwFL6Vpbs=",
         linkedin: "#"
       }
     ]

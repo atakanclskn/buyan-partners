@@ -15,7 +15,6 @@ const Founders = () => {
       {/* Container'ı "max-w-full" ve "px-4" yaparak ekranın kenarlarına yaklaştırdık */}
       <div className="container mx-auto px-4 max-w-[1600px]">
         
-        {/* Başlık kısmı SİLİNDİ */}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {founders.items.map((founder, index) => (
