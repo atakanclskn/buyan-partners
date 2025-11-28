@@ -1,50 +1,16 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useSite } from '../context/SiteContext';
-import { db, storage } from '../firebase'; // storage eklendi
+import { db } from '../firebase';
 import { doc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'; // Storage fonksiyonları
-import { X, Save, Layout, Type, Briefcase, Users, Phone, Plus, Trash2, Upload, ChevronDown, ChevronRight, Edit3, ArrowLeft } from 'lucide-react';
+import { X, Save, Layout, Type, Briefcase, Users, Phone, Plus, Trash2, Edit3, ArrowLeft } from 'lucide-react';
 
 const AdminPanel = ({ onClose }) => {
   const { config } = useSite();
   const [activeTab, setActiveTab] = useState('hero');
   const [formData, setFormData] = useState(JSON.parse(JSON.stringify(config))); 
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false); // Resim yükleme durumu
 
-  // Service Details Editing Mode
   const [editingServiceId, setEditingServiceId] = useState(null); 
-
-  // --- HELPER: IMAGE UPLOAD ---
-  const handleImageUpload = async (file, path, section, key, index = null) => {
-    if (!file) return;
-    setUploading(true);
-    try {
-      const storageRef = ref(storage, `images/${path}/${Date.now()}_${file.name}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-
-      // State'i güncelle
-      if (index !== null) {
-        // Dizi içindeyse (Founders gibi)
-        const newList = [...formData[section].items];
-        newList[index] = { ...newList[index], [key]: url };
-        setFormData(prev => ({ ...prev, [section]: { ...prev[section], items: newList } }));
-      } else {
-        // Düz alan ise (Hero bg gibi)
-        setFormData(prev => ({
-          ...prev,
-          [section]: { ...prev[section], [key]: url }
-        }));
-      }
-      alert("Image uploaded successfully! Don't forget to SAVE changes.");
-    } catch (error) {
-      console.error("Upload failed", error);
-      alert("Upload failed: " + error.message);
-    } finally {
-      setUploading(false);
-    }
-  };
 
   const handleChange = (section, key, value) => {
     setFormData(prev => ({ ...prev, [section]: { ...prev[section], [key]: value } }));
@@ -58,15 +24,17 @@ const AdminPanel = ({ onClose }) => {
 
   const handleAddItem = (section, template) => {
     const newItem = { id: Date.now(), ...template };
-    setFormData(prev => ({
-      ...prev, [section]: { ...prev[section], items: [...prev[section].items, newItem] }
-    }));
+    setFormData(prev => ({ ...prev, [section]: { ...prev[section], items: [...prev[section].items, newItem] } }));
   };
 
   const handleDeleteItem = (section, index) => {
-    if(!window.confirm("Are you sure you want to delete this item?")) return;
+    if(!window.confirm("Are you sure?")) return;
     const newList = formData[section].items.filter((_, i) => i !== index);
     setFormData(prev => ({ ...prev, [section]: { ...prev[section], items: newList } }));
+  };
+
+  const handleContactInfoChange = (key, value) => {
+    setFormData(prev => ({ ...prev, contact: { ...prev.contact, info: { ...prev.contact.info, [key]: value } } }));
   };
 
   const handleSave = async (sectionName) => {
@@ -77,30 +45,22 @@ const AdminPanel = ({ onClose }) => {
       alert(`${sectionName.toUpperCase()} updated successfully! 🎉`);
     } catch (error) {
       console.error("Error:", error);
-      alert("Error saving data: " + error.message);
+      alert("Error: " + error.message);
     } finally {
       setSaving(false);
     }
   };
 
-  // --- SERVICE DETAILS EDITOR LOGIC ---
   const handleDetailChange = (serviceIndex, detailIndex, key, value) => {
     const newServices = [...formData.services.items];
-    
-    // Listeyi string olarak alıp array'e çevirme (Textarea için)
     if (key === 'list') {
       value = value.split('\n').filter(item => item.trim() !== '');
     }
-
     newServices[serviceIndex].details[detailIndex] = {
       ...newServices[serviceIndex].details[detailIndex],
       [key]: value
     };
-
-    setFormData(prev => ({
-      ...prev,
-      services: { ...prev.services, items: newServices }
-    }));
+    setFormData(prev => ({ ...prev, services: { ...prev.services, items: newServices } }));
   };
 
   const TabButton = ({ id, icon: Icon, label }) => (
@@ -110,21 +70,6 @@ const AdminPanel = ({ onClose }) => {
     >
       <Icon size={18} /> {label}
     </button>
-  );
-
-  const FileInput = ({ section, itemKey, index = null }) => (
-    <div className="mt-2">
-      <label className="flex items-center gap-2 cursor-pointer bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 px-4 py-2 rounded-lg text-xs font-bold uppercase transition-colors w-fit">
-        <Upload size={14} /> {uploading ? "Uploading..." : "Upload Image"}
-        <input 
-          type="file" 
-          className="hidden" 
-          accept="image/*"
-          onChange={(e) => handleImageUpload(e.target.files[0], section, section, itemKey, index)}
-          disabled={uploading}
-        />
-      </label>
-    </div>
   );
 
   return (
@@ -170,19 +115,17 @@ const AdminPanel = ({ onClose }) => {
               <div>
                 <label className="label">Background Image URL</label>
                 <div className="flex gap-4 items-center">
-                  <input type="text" className="input-field" value={formData.hero.backgroundImage} onChange={(e) => handleChange('hero', 'backgroundImage', e.target.value)} />
-                  <img src={formData.hero.backgroundImage} alt="Preview" className="w-16 h-10 object-cover rounded border" />
+                  <input type="text" className="input-field" value={formData.hero.backgroundImage} onChange={(e) => handleChange('hero', 'backgroundImage', e.target.value)} placeholder="https://..." />
+                  {formData.hero.backgroundImage && <img src={formData.hero.backgroundImage} alt="Preview" className="w-16 h-10 object-cover rounded border" />}
                 </div>
-                <FileInput section="hero" itemKey="backgroundImage" />
               </div>
               <SaveButton saving={saving} onClick={() => handleSave('hero')} />
             </div>
           )}
 
-          {/* --- SERVICES (ADVANCED) --- */}
+          {/* --- SERVICES --- */}
           {activeTab === 'services' && (
             <div className="space-y-8">
-              {/* SERVICE LIST VIEW */}
               {editingServiceId === null ? (
                 <>
                   <div className="flex justify-between items-center border-b pb-4 mb-6 border-gray-100 dark:border-slate-700">
@@ -194,14 +137,12 @@ const AdminPanel = ({ onClose }) => {
                       <Plus size={16} /> Add New
                     </button>
                   </div>
-
                   <div>
                     <label className="label">Section Title</label>
                     <input type="text" className="input-field mb-4" value={formData.services.title} onChange={(e) => handleChange('services', 'title', e.target.value)} />
                     <label className="label">Subtitle</label>
                     <textarea rows="2" className="input-field" value={formData.services.subtitle} onChange={(e) => handleChange('services', 'subtitle', e.target.value)} />
                   </div>
-
                   <div className="space-y-4 mt-6">
                     {formData.services.items.map((service, index) => (
                       <div key={service.id} className="p-4 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50">
@@ -225,35 +166,21 @@ const AdminPanel = ({ onClose }) => {
                   <SaveButton saving={saving} onClick={() => handleSave('services')} />
                 </>
               ) : (
-                // --- SERVICE DETAIL EDIT VIEW ---
                 <div className="space-y-6">
                   <div className="flex items-center gap-4 border-b pb-4 mb-6 border-gray-100 dark:border-slate-700">
                     <button onClick={() => setEditingServiceId(null)} className="p-2 hover:bg-gray-100 rounded-full"><ArrowLeft size={20} /></button>
                     <div>
                       <h3 className="text-xl font-bold">Editing: {formData.services.items[editingServiceId].title}</h3>
-                      <p className="text-xs text-gray-500">Edit the detailed list content for this service.</p>
+                      <p className="text-xs text-gray-500">Edit the detailed list content.</p>
                     </div>
                   </div>
-
                   <div className="grid grid-cols-1 gap-6">
-                    {formData.services.items[editingServiceId].details.map((detail, dIndex) => (
+                    {formData.services.items[editingServiceId].details && formData.services.items[editingServiceId].details.map((detail, dIndex) => (
                       <div key={dIndex} className="p-4 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl">
                         <label className="label">Sub-Section Title</label>
-                        <input 
-                          type="text" 
-                          className="input-field mb-4 font-bold" 
-                          value={detail.title} 
-                          onChange={(e) => handleDetailChange(editingServiceId, dIndex, 'title', e.target.value)} 
-                        />
-                        
+                        <input type="text" className="input-field mb-4 font-bold" value={detail.title} onChange={(e) => handleDetailChange(editingServiceId, dIndex, 'title', e.target.value)} />
                         <label className="label">List Items (One per line)</label>
-                        <textarea 
-                          rows="5" 
-                          className="input-field font-mono text-sm" 
-                          value={detail.list.join('\n')} 
-                          onChange={(e) => handleDetailChange(editingServiceId, dIndex, 'list', e.target.value)} 
-                          placeholder="Item 1&#10;Item 2&#10;Item 3"
-                        />
+                        <textarea rows="5" className="input-field font-mono text-sm" value={detail.list ? detail.list.join('\n') : ''} onChange={(e) => handleDetailChange(editingServiceId, dIndex, 'list', e.target.value)} />
                       </div>
                     ))}
                   </div>
@@ -283,18 +210,17 @@ const AdminPanel = ({ onClose }) => {
                 <textarea rows="6" className="input-field" value={formData.about.description} onChange={(e) => handleChange('about', 'description', e.target.value)} />
               </div>
               <div>
-                <label className="label">About Image</label>
+                <label className="label">About Image URL</label>
                 <div className="flex gap-4 items-center">
                   <input type="text" className="input-field" value={formData.about.image} onChange={(e) => handleChange('about', 'image', e.target.value)} />
-                  <img src={formData.about.image} alt="Preview" className="w-16 h-10 object-cover rounded border" />
+                  {formData.about.image && <img src={formData.about.image} alt="Preview" className="w-16 h-10 object-cover rounded border" />}
                 </div>
-                <FileInput section="about" itemKey="image" />
               </div>
               <SaveButton saving={saving} onClick={() => handleSave('about')} />
             </div>
           )}
 
-          {/* --- FOUNDERS --- */}
+          {/* --- FOUNDERS (GÜNCELLENDİ: LinkedIn Eklendi) --- */}
           {activeTab === 'founders' && (
             <div className="space-y-8">
               <div className="flex justify-between items-center border-b pb-4 mb-6 border-gray-100 dark:border-slate-700">
@@ -325,12 +251,23 @@ const AdminPanel = ({ onClose }) => {
                   </div>
                   
                   <div className="mb-4">
-                    <label className="label">Photo</label>
+                    <label className="label">Photo URL</label>
                     <div className="flex gap-4 items-center mb-2">
-                      <input type="text" className="input-field" value={founder.image} onChange={(e) => handleArrayChange('founders', index, 'image', e.target.value)} />
-                      <img src={founder.image} alt="Preview" className="w-10 h-10 object-cover rounded-full border" />
+                      <input type="text" className="input-field" value={founder.image} onChange={(e) => handleArrayChange('founders', index, 'image', e.target.value)} placeholder="https://..." />
+                      {founder.image && <img src={founder.image} alt="Preview" className="w-10 h-10 object-cover rounded-full border" />}
                     </div>
-                    <FileInput section="founders" itemKey="image" index={index} />
+                  </div>
+
+                  {/* YENİ EKLENEN LINKEDIN ALANI */}
+                  <div className="mb-4">
+                    <label className="label">LinkedIn Profile URL</label>
+                    <input 
+                      type="text" 
+                      className="input-field" 
+                      value={founder.linkedin} 
+                      onChange={(e) => handleArrayChange('founders', index, 'linkedin', e.target.value)} 
+                      placeholder="https://linkedin.com/in/..." 
+                    />
                   </div>
 
                   <div>
