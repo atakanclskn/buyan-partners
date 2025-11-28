@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react"; // useState ve useEffect eklendi
 import { useSite } from "./context/SiteContext";
-import { AnimatePresence } from "framer-motion"; // AnimatePresence eklendi
+import { useState, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
+
 import Navbar from "./components/Navbar"; 
 import Services from "./components/Services";
 import About from "./components/About";
@@ -8,33 +9,39 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import Reveal from "./components/Reveal"; 
 import Founders from "./components/Founders"; 
-import Preloader from "./components/Preloader";
-import DataUploader from "./components/DataUploader";
+import Preloader from "./components/Preloader"; 
 
 function App() {
   const { config } = useSite();
-  const [isLoading, setIsLoading] = useState(true); // Yükleme durumu
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Site açılınca 2.5 saniye bekle (Yükleme simülasyonu)
+  // Akıllı Yükleme Mantığı
   useEffect(() => {
-    // Gerçek bir proje yüklemesi olsaydı window.onload kullanırdık.
-    // Şimdilik "Premium" hissi vermek için zamanlayıcı kullanıyoruz.
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2500); // 2.5 Saniye
+    const handleLoad = async () => {
+      const pageLoadPromise = new Promise((resolve) => {
+        if (document.readyState === "complete") {
+          resolve();
+        } else {
+          window.addEventListener("load", resolve);
+        }
+      });
 
-    return () => clearTimeout(timer);
+      const minTimerPromise = new Promise((resolve) => setTimeout(resolve, 1500));
+
+      await Promise.all([pageLoadPromise, minTimerPromise]);
+      setIsLoading(false);
+    };
+
+    handleLoad();
   }, []);
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white font-sans transition-colors duration-300">
       
-      {/* PRELOADER (AnimatePresence ile sarmalandı ki çıkarken animasyon oynasın) */}
       <AnimatePresence mode="wait">
         {isLoading && <Preloader />}
       </AnimatePresence>
 
-      {/* Site İçeriği (Yükleme bitmeden arkada render olur ama Preloader üstte durur) */}
       {!isLoading && (
         <>
           <Navbar />
@@ -71,7 +78,6 @@ function App() {
           <Founders /> 
           <Contact />  
           <Footer /> 
-          <DataUploader />
         </>
       )}
       
