@@ -8,9 +8,8 @@ const Navbar = () => {
   const { navigation, general } = config;
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [hoveredTab, setHoveredTab] = useState(null); // YENİ: Hangi linkin üzerindeyiz?
 
-  // --- SCROLL PROGRESS ---
+  // --- SCROLL PROGRESS AYARLARI ---
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -18,6 +17,7 @@ const Navbar = () => {
     restDelta: 0.001
   });
 
+  // --- SCROLL DURUMU TAKİBİ (NAVBAR ŞEKLİ İÇİN) ---
   const [isScrolled, setIsScrolled] = useState(() => {
     if (typeof window !== "undefined") {
       return window.scrollY > (window.innerHeight - 100);
@@ -25,6 +25,7 @@ const Navbar = () => {
     return false;
   });
 
+  // 1. Efekt: Navbar'ın şeklini (Hap/Tam) ayarlar
   useEffect(() => {
     const handleScroll = () => {
       const heroHeight = window.innerHeight - 100;
@@ -32,9 +33,23 @@ const Navbar = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll();
+    handleScroll(); // İlk açılışta kontrol et
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // 2. Efekt: Menü açıkken scroll yapılırsa menüyü kapat (DÜZELTİLDİ)
+  useEffect(() => {
+    if (!isMobileMenuOpen) return; // Menü kapalıysa dinleme yapma
+
+    const closeMenuOnScroll = () => {
+      setIsMobileMenuOpen(false);
+    };
+
+    window.addEventListener("scroll", closeMenuOnScroll);
+    
+    // Temizleme: Menü kapanınca dinleyiciyi kaldır
+    return () => window.removeEventListener("scroll", closeMenuOnScroll);
+  }, [isMobileMenuOpen]);
 
   const handleScrollToTop = (e) => {
     e.preventDefault();
@@ -50,7 +65,7 @@ const Navbar = () => {
     }
   };
 
-  // Stil Ayarları
+  // --- STİL AYARLARI ---
   const glassStyle = {
     backgroundColor: isScrolled || isMobileMenuOpen
       ? darkMode
@@ -69,11 +84,12 @@ const Navbar = () => {
 
   const currentWidth = (isScrolled || isMobileMenuOpen) ? "90%" : "100%";
   const maxWidth = (isScrolled || isMobileMenuOpen) ? "1000px" : "100%";
+  
   const topBarRadius = isMobileMenuOpen 
     ? "24px 24px 0px 0px" 
     : (isScrolled ? "50px" : "0px");
 
-  // Animasyonlar
+  // --- ANİMASYON VARYANTLARI ---
   const menuVariants = {
     closed: { opacity: 0, y: -20, transition: { duration: 0.2, ease: "easeInOut" } },
     open: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30, staggerChildren: 0.1, delayChildren: 0.1 } }
@@ -88,7 +104,7 @@ const Navbar = () => {
     <>
       <div className="fixed top-0 left-0 right-0 z-50 flex flex-col items-center pointer-events-none">
         
-        {/* --- ANA NAVBAR --- */}
+        {/* --- 1. ANA NAVBAR --- */}
         <motion.nav
           initial={false}
           animate={{
@@ -111,7 +127,7 @@ const Navbar = () => {
           className="flex justify-between items-center shadow-lg box-border w-full pointer-events-auto z-50 relative overflow-hidden"
         >
           {/* LOGO */}
-          <div className="text-2xl font-bold cursor-pointer shrink-0 whitespace-nowrap z-10">
+          <div className="text-2xl font-bold cursor-pointer shrink-0 whitespace-nowrap">
             <a
               href="/"
               onClick={handleScrollToTop}
@@ -123,52 +139,30 @@ const Navbar = () => {
             </a>
           </div>
 
-          {/* --- MASAÜSTÜ MENÜ (YENİ KAYAN HAP EFEKTİ) --- */}
-          <div className="hidden md:flex items-center space-x-2 font-medium whitespace-nowrap z-10" 
-               onMouseLeave={() => setHoveredTab(null)}> {/* Menüden çıkınca hap kaybolsun */}
-            
+          {/* MASAÜSTÜ MENÜ */}
+          <div className="hidden md:flex items-center space-x-8 font-medium whitespace-nowrap">
             {navigation.map((item) => (
               <a
                 key={item.id}
                 href={item.path}
                 onClick={(e) => handleLinkClick(e, item.path)}
-                onMouseEnter={() => setHoveredTab(item.id)} // Üzerine gelince ID'yi set et
-                className={`relative px-4 py-2 rounded-full transition-colors duration-300
+                className={`relative group py-2 transition-colors duration-300
                   ${
-                    // Yazı rengi ayarı
                     isScrolled
-                      ? "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                      : "text-white/80 hover:text-white"
+                      ? "text-gray-700 dark:text-gray-200 hover:text-secondary"
+                      : "text-white/90 hover:text-white"
                   }
                 `}
               >
-                {/* Metin (Z-Index ile en üstte) */}
-                <span className="relative z-10">{item.title}</span>
-
-                {/* --- SİHİRLİ ARKA PLAN HAPI --- */}
-                {hoveredTab === item.id && (
-                  <motion.span
-                    layoutId="nav-pill"
-                    
-                    // YENİ EKLENEN KISIM: GİRİŞ ANİMASYONU
-                    initial={{ opacity: 0, scale: 0.8 }} // Başlarken: Görünmez ve %80 boyutunda
-                    animate={{ opacity: 1, scale: 1 }}   // Biterken: Tam görünür ve %100 boyutunda
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 300, 
-                      damping: 30 
-                    }}
-                    
-                    className="absolute inset-0 rounded-full bg-gray-200/50 dark:bg-white/10 backdrop-blur-sm -z-0"
-                  />
-                )}
+                {item.title}
+                {/* Premium Hover Efekti */}
+                <span className="absolute bottom-0 left-0 w-full h-[2px] bg-secondary rounded-full origin-center scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span>
               </a>
             ))}
 
-            {/* DARK MODE */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className={`ml-2 p-2 rounded-full transition-all cursor-pointer overflow-hidden border
+              className={`ml-4 p-2 rounded-full transition-all cursor-pointer overflow-hidden border
                 ${
                   isScrolled
                     ? "bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white"
@@ -188,7 +182,7 @@ const Navbar = () => {
           </div>
 
           {/* MOBİL BUTONLAR */}
-          <div className="md:hidden flex items-center gap-4 z-10">
+          <div className="md:hidden flex items-center gap-4">
              <button
               onClick={() => setDarkMode(!darkMode)}
               className={`p-2 rounded-full transition-all cursor-pointer overflow-hidden border
@@ -212,7 +206,7 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* SCROLL BAR */}
+          {/* --- SCROLL PROGRESS BAR --- */}
           <motion.div
             style={{ scaleX }}
             className="absolute bottom-0 left-0 right-0 h-[2px] bg-secondary dark:bg-white origin-left z-50"
@@ -235,9 +229,11 @@ const Navbar = () => {
                 borderWidth: "1px",
                 borderStyle: "solid",
                 borderColor: glassStyle.borderColor,
-                borderTop: "none",
+                
+                borderTop: "none", 
                 borderRadius: "0px 0px 24px 24px", 
                 marginTop: "-1px", 
+                
                 width: currentWidth,
                 maxWidth: maxWidth,
               }}
