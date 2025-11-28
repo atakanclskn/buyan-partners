@@ -12,6 +12,10 @@
 
 html {
   /* 1. Işınlanmayı engeller, kayarak gitmesini sağlar */
+ /* Firefox için gizle */
+  scrollbar-width: none; 
+  /* IE ve Edge için gizle */
+  -ms-overflow-style: none;
   scroll-behavior: smooth;
   
   /* 2. Navbar sabit olduğu için başlıkların altında kalmasını engeller */
