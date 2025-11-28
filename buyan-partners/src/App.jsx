@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"; // useState ve useEffect eklendi
 import { useSite } from "./context/SiteContext";
 import { AnimatePresence } from "framer-motion"; // AnimatePresence eklendi
-
 import Navbar from "./components/Navbar"; 
 import Services from "./components/Services";
 import About from "./components/About";
@@ -9,7 +8,8 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import Reveal from "./components/Reveal"; 
 import Founders from "./components/Founders"; 
-import Preloader from "./components/Preloader"; // <-- İMPORT EDİLDİ
+import Preloader from "./components/Preloader";
+import DataUploader from "./components/DataUploader";
 
 function App() {
   const { config } = useSite();
@@ -71,6 +71,7 @@ function App() {
           <Founders /> 
           <Contact />  
           <Footer /> 
+          <DataUploader />
         </>
       )}
       

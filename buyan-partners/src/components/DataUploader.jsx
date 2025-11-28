@@ -4,17 +4,24 @@ import { doc, setDoc } from 'firebase/firestore';
 import { useState } from 'react';
 
 const DataUploader = () => {
-  const [status, setStatus] = useState("Idle"); // Başlangıç durumu: Boşta
+  const [status, setStatus] = useState("Idle");
 
   const uploadData = async () => {
-    setStatus("Uploading..."); // Yükleniyor...
+    setStatus("Uploading...");
     try {
-      // Loop through all keys in siteConfig (hero, services, about...)
       const sections = Object.keys(siteConfig);
       
       for (const section of sections) {
-        // Create/Update a document in 'site-content' collection with the section name
-        await setDoc(doc(db, "site-content", section), siteConfig[section]);
+        let dataToUpload = siteConfig[section];
+
+        // --- KRİTİK DÜZELTME ---
+        // Eğer veri bir DİZİ (Array) ise, onu bir OBJE içine sarıyoruz.
+        // Çünkü Firestore root seviyesinde array kabul etmez.
+        if (Array.isArray(dataToUpload)) {
+          dataToUpload = { items: dataToUpload };
+        }
+
+        await setDoc(doc(db, "site-content", section), dataToUpload);
       }
 
       setStatus("✅ Success! Data uploaded.");
@@ -22,7 +29,8 @@ const DataUploader = () => {
     } catch (error) {
       console.error("Error:", error);
       setStatus("❌ Error: " + error.message);
-      alert("An error occurred. Check the console for details.");
+      // Hata detayını görmek için alert de ekleyelim
+      alert("Upload failed! Check the red text box for details.");
     }
   };
 
@@ -30,7 +38,7 @@ const DataUploader = () => {
     <div className="fixed bottom-4 left-4 z-[9999] bg-white p-6 rounded-xl shadow-2xl border border-gray-200 max-w-sm text-gray-900">
       <h3 className="font-bold text-lg mb-2">Database Setup</h3>
       <p className="text-sm text-gray-500 mb-4">
-        This tool uploads static data from <b>siteConfig.js</b> to your Firebase database. You only need to run this once.
+        This tool uploads static data from <b>siteConfig.js</b> to your Firebase database.
       </p>
       
       <div className="flex flex-col gap-2">
@@ -41,7 +49,7 @@ const DataUploader = () => {
         >
           {status === "Uploading..." ? "Uploading..." : "Upload Data 🚀"}
         </button>
-        <span className="text-xs font-mono bg-gray-100 p-2 rounded text-center border border-gray-100">
+        <span className="text-xs font-mono bg-gray-100 p-2 rounded text-center border border-gray-100 break-words">
           Status: {status}
         </span>
       </div>
