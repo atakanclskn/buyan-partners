@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSite } from "../context/SiteContext";
-import { Menu, X, Moon, Sun, ArrowRight } from "lucide-react"; // ArrowRight eklendi
+import { Menu, X, Moon, Sun, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
@@ -9,7 +9,6 @@ const Navbar = () => {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Başlangıç scroll durumunu kontrol et
   const [isScrolled, setIsScrolled] = useState(() => {
     if (typeof window !== "undefined") {
       return window.scrollY > (window.innerHeight - 100);
@@ -17,7 +16,6 @@ const Navbar = () => {
     return false;
   });
 
-  // Scroll Takibi
   useEffect(() => {
     const handleScroll = () => {
       const heroHeight = window.innerHeight - 100;
@@ -25,18 +23,9 @@ const Navbar = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // İlk yüklemede kontrol
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Mobil Menü Açılınca Scroll Kilidi (İsteğe bağlı, bu tasarımda kilitlemeye gerek kalmayabilir ama güvenli)
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-  }, [isMobileMenuOpen]);
 
   const handleScrollToTop = (e) => {
     e.preventDefault();
@@ -52,26 +41,56 @@ const Navbar = () => {
     }
   };
 
-  // --- STİL AYARLARI (NAVBAR & MOBİL MENÜ ORTAK) ---
+  // --- DÜZELTME BURADA: CAM (GLASS) STİLİ ---
   const glassStyle = {
     backgroundColor: isScrolled
       ? darkMode
-        ? "rgba(15, 23, 42, 0.85)" // Dark Scrolled
-        : "rgba(255, 255, 255, 0.9)" // Light Scrolled
+        ? "rgba(15, 23, 42, 0.9)" // Aşağı inince: %90 Opak (Okunabilirlik için)
+        : "rgba(255, 255, 255, 0.95)"
       : darkMode 
-        ? "rgba(0, 0, 0, 0.6)" // Dark Top (Biraz daha belirgin olsun diye)
-        : "rgba(255, 255, 255, 0.1)", // Light Top (Şeffaf)
-    backdropFilter: "blur(16px)",
+        ? "rgba(0, 0, 0, 0.4)" // <-- DEĞİŞTİ: Tepedeyken: %40 Opak (Hero resmi görünsün)
+        : "rgba(255, 255, 255, 0.1)",
+    
+    // Blur miktarını tepedeyken biraz azalttık ki resim daha net seçilsin
+    backdropFilter: isScrolled ? "blur(20px)" : "blur(12px)",
+    
     border: isScrolled
       ? darkMode
         ? "1px solid rgba(255,255,255,0.1)"
         : "1px solid rgba(255,255,255,0.5)"
-      : "1px solid rgba(255,255,255,0.05)", // Tepedeyken hafif sınır
+      : "1px solid rgba(255,255,255,0.05)",
+  };
+
+  // Animasyon Varyantları
+  const menuVariants = {
+    closed: {
+      opacity: 0,
+      y: -20,
+      scale: 0.95,
+      transition: { duration: 0.2, ease: "easeInOut" }
+    },
+    open: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        staggerChildren: 0.1,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    closed: { opacity: 0, x: -10 },
+    open: { opacity: 1, x: 0 }
   };
 
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50 flex flex-col items-center transition-all duration-300 pointer-events-none">
+      <div className="fixed top-0 left-0 right-0 z-50 flex flex-col items-center pointer-events-none">
         
         {/* --- ANA NAVBAR --- */}
         <motion.nav
@@ -81,14 +100,24 @@ const Navbar = () => {
             width: isScrolled ? "85%" : "100%",
             maxWidth: isScrolled ? "1000px" : "100%",
             borderRadius: isScrolled ? "50px" : "0px",
+            // Padding ve Stil ayarları animate içinde
+            backgroundColor: glassStyle.backgroundColor, // Stil objesinden alıyoruz
+            backdropFilter: glassStyle.backdropFilter,
+            border: glassStyle.border,
+            
             paddingLeft: isScrolled ? "1.5rem" : "2rem",
             paddingRight: isScrolled ? "1.5rem" : "2rem",
             paddingTop: isScrolled ? "0.75rem" : "1.5rem",
             paddingBottom: isScrolled ? "0.75rem" : "1.5rem",
           }}
-          transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-          className="flex justify-between items-center shadow-lg box-border w-full pointer-events-auto z-50"
-          style={glassStyle} // Ortak stil kullanıldı
+          transition={{
+            duration: 1.5, 
+            ease: [0.22, 1, 0.36, 1]
+          }}
+          className="flex justify-between items-center shadow-sm box-border w-full pointer-events-auto z-50 transition-shadow"
+          style={{
+            boxShadow: isScrolled ? "0 10px 30px -10px rgba(0,0,0,0.1)" : "none"
+          }}
         >
           {/* LOGO */}
           <div className="text-2xl font-bold cursor-pointer shrink-0 whitespace-nowrap">
@@ -145,9 +174,8 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* MOBİL BUTONLAR (SAĞ TARAFA YASLI) */}
+          {/* MOBİL BUTONLAR */}
           <div className="md:hidden flex items-center gap-4">
-             {/* Dark Mode Butonu (Mobil için buraya da ekledik) */}
              <button
               onClick={() => setDarkMode(!darkMode)}
               className={`p-2 rounded-full transition-all cursor-pointer overflow-hidden border
@@ -161,7 +189,6 @@ const Navbar = () => {
               {darkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            {/* Hamburger Menü Butonu */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={`transition-colors cursor-pointer ${
@@ -173,42 +200,46 @@ const Navbar = () => {
           </div>
         </motion.nav>
 
-        {/* --- YENİ MOBİL MENÜ (DROPDOWN GLASS) --- */}
+        {/* --- MOBİL MENÜ (DROPDOWN) --- */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -20, height: 0 }}
-              animate={{ 
-                opacity: 1, 
-                y: isScrolled ? 30 : 0, // Scrolled ise biraz boşluk bırak
-                height: "auto",
-                // Genişlik ve Border Radius ana navbar ile senkronize
+              variants={menuVariants}
+              initial="closed"
+              animate="open"
+              exit="closed"
+              className="pointer-events-auto overflow-hidden shadow-2xl md:hidden w-full z-40 absolute"
+              style={{
+                // Stil ayarlarını 'style' prop'una verdik
+                backgroundColor: glassStyle.backgroundColor,
+                backdropFilter: glassStyle.backdropFilter,
+                border: glassStyle.border,
+                
+                // Diğer ayarlar
+                top: "100%", 
+                marginTop: isScrolled ? "15px" : "0px",
                 width: isScrolled ? "85%" : "100%",
                 maxWidth: isScrolled ? "1000px" : "100%",
                 borderRadius: isScrolled ? "30px" : "0px",
-              }}
-              exit={{ opacity: 0, y: -20, height: 0 }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-              
-              className="pointer-events-auto overflow-hidden shadow-2xl mt-2 md:hidden absolute top-full"
-              style={{
-                ...glassStyle, // Ana navbar ile aynı cam efekti
-                zIndex: 40
+                borderTop: "none",
+                borderTopLeftRadius: isScrolled ? "30px" : "0", 
+                borderTopRightRadius: isScrolled ? "30px" : "0",
               }}
             >
-              <div className="p-6 flex flex-col space-y-4">
+              <div className="p-6 flex flex-col space-y-2">
                 {navigation.map((item) => (
-                  <a
+                  <motion.a
                     key={item.id}
                     href={item.path}
+                    variants={itemVariants} 
                     onClick={(e) => handleLinkClick(e, item.path)}
-                    className="flex items-center justify-between group p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                    className="flex items-center justify-between group p-4 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
                   >
-                    <span className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-secondary transition-colors">
+                    <span className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-secondary transition-colors">
                       {item.title}
                     </span>
                     <ArrowRight size={20} className="text-gray-400 group-hover:text-secondary -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
-                  </a>
+                  </motion.a>
                 ))}
               </div>
             </motion.div>
