@@ -5,19 +5,24 @@ const Footer = () => {
   const { config } = useSite();
   const { footer, general } = config;
 
-  // Yukarı Çıkma Fonksiyonu
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // İkon Eşleştirme (X Logosu için özel SVG kullanıyoruz)
+  // Link Tıklama Yöneticisi
+  const handleLinkClick = (e, path) => {
+    if (path === "/") {
+      e.preventDefault();
+      scrollToTop();
+    }
+  };
+
   const getSocialIcon = (name) => {
     switch (name) {
       case 'linkedin': return <Linkedin size={20} />;
       case 'instagram': return <Instagram size={20} />;
       case 'facebook': return <Facebook size={20} />;
       case 'x': return (
-        // X (Twitter) Özel SVG Logosu
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
         </svg>
@@ -32,7 +37,6 @@ const Footer = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           
-          {/* 1. Sütun: Logo ve Açıklama */}
           <div className="col-span-1 md:col-span-2">
             <h2 className="text-2xl font-bold mb-6 tracking-wide">{general.logoText}</h2>
             <p className="text-gray-400 leading-relaxed max-w-sm">
@@ -40,13 +44,16 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* 2. Sütun: Menü */}
           <div>
             <h3 className="font-bold text-lg mb-6">{footer.labels.menu}</h3>
             <ul className="space-y-4 text-gray-400">
               {config.navigation.map((item) => (
                 <li key={item.id}>
-                  <a href={item.path} className="hover:text-secondary transition-colors">
+                  <a 
+                    href={item.path} 
+                    onClick={(e) => handleLinkClick(e, item.path)} // <-- BURAYI GÜNCELLEDİK
+                    className="hover:text-secondary transition-colors"
+                  >
                     {item.title}
                   </a>
                 </li>
@@ -54,7 +61,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* 3. Sütun: Yasal */}
           <div>
             <h3 className="font-bold text-lg mb-6">{footer.labels.legal}</h3>
             <ul className="space-y-4 text-gray-400">
@@ -67,7 +73,6 @@ const Footer = () => {
               ))}
             </ul>
 
-            {/* Sosyal Medya İkonları */}
             <div className="flex gap-4 mt-8">
               {footer.socials.map((social) => (
                 <a 
@@ -83,7 +88,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Alt Çizgi ve Telif Hakkı */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-500 text-sm">
             {general.footerText}

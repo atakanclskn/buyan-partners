@@ -10,10 +10,8 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Scroll Takibi
   useEffect(() => {
     const handleScroll = () => {
-      // Hero bölümü (ekran boyu - 100px) bitince tetiklensin
       const heroHeight = window.innerHeight - 100;
       setIsScrolled(window.scrollY > heroHeight);
     };
@@ -29,6 +27,22 @@ const Navbar = () => {
       document.body.style.overflow = "unset";
     }
   }, [isMobileMenuOpen]);
+
+  // --- YENİ: YUMUŞAK SCROLL FONKSİYONU ---
+  const handleScrollToTop = (e) => {
+    e.preventDefault(); // Işınlanmayı (varsayılan davranışı) engelle
+    window.scrollTo({ top: 0, behavior: "smooth" }); // Yağ gibi kay
+    setIsMobileMenuOpen(false); // Mobildeysek menüyü kapat
+  };
+
+  // Link Tıklama Yöneticisi (Home ise yukarı, değilse normal git)
+  const handleLinkClick = (e, path) => {
+    if (path === "/") {
+      handleScrollToTop(e);
+    } else {
+      setIsMobileMenuOpen(false);
+    }
+  };
 
   return (
     <>
@@ -53,18 +67,15 @@ const Navbar = () => {
                 ? "1px solid rgba(255,255,255,0.1)"
                 : "1px solid rgba(255,255,255,0.5)"
               : "1px solid rgba(0,0,0,0)",
-            // Padding animasyonu (Su damlası efekti)
             paddingLeft: isScrolled ? "1.5rem" : "2rem",
             paddingRight: isScrolled ? "1.5rem" : "2rem",
             paddingTop: isScrolled ? "0.75rem" : "1.5rem",
             paddingBottom: isScrolled ? "0.75rem" : "1.5rem",
           }}
-          // --- OPTİMİZE EDİLMİŞ GEÇİŞ (Tek fark burası) ---
           transition={{
             duration: 1.6, 
-            ease: [0.22, 1, 0.36, 1] // Apple-style Smoothness
+            ease: [0.22, 1, 0.36, 1]
           }}
-          // -----------------------------------------------
           className="flex justify-between items-center shadow-sm box-border w-full pointer-events-auto"
           style={{
             boxShadow: isScrolled
@@ -72,10 +83,11 @@ const Navbar = () => {
               : "none",
           }}
         >
-          {/* LOGO */}
+          {/* LOGO (Tıklanınca Yumuşakça En Başa Döner) */}
           <div className="text-2xl font-bold cursor-pointer shrink-0 whitespace-nowrap">
             <a
               href="/"
+              onClick={handleScrollToTop} 
               className={`${
                 isScrolled ? "text-gray-900 dark:text-white" : "text-white"
               } transition-colors duration-300`}
@@ -90,6 +102,7 @@ const Navbar = () => {
               <a
                 key={item.id}
                 href={item.path}
+                onClick={(e) => handleLinkClick(e, item.path)} 
                 className={`relative group transition-colors duration-300
                   ${
                     isScrolled
@@ -139,7 +152,7 @@ const Navbar = () => {
         </motion.nav>
       </div>
 
-      {/* MOBİL MENÜ OVERLAY (Değişmedi) */}
+      {/* MOBİL MENÜ OVERLAY */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -147,7 +160,7 @@ const Navbar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-9999 h-screen w-screen flex flex-col bg-white dark:bg-slate-950"
+            className="fixed inset-0 z-[9999] h-screen w-screen flex flex-col bg-white dark:bg-slate-950"
           >
             <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-white/10">
               <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -168,12 +181,13 @@ const Navbar = () => {
                 </button>
               </div>
             </div>
-            <div className="flex flex-col items-center justify-center grow space-y-8">
+            <div className="flex flex-col items-center justify-center flex-grow space-y-8">
               {navigation.map((item) => (
                 <a
                   key={item.id}
                   href={item.path}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  // MOBİLDE DE AYNI MANTIK: Home ise yukarı kay, değilse git.
+                  onClick={(e) => handleLinkClick(e, item.path)} 
                   className="text-3xl font-bold text-gray-900 dark:text-white hover:text-secondary transition-colors"
                 >
                   {item.title}
