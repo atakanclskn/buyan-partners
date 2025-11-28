@@ -45,11 +45,12 @@ function App() {
         </div>
       </header>
 
-      {/* SIRALAMA DÜZELTİLDİ */}
-      <Founders /> {/* Yeni eklediğimiz Liderlik kısmı */}
+      
+      
       {/* <Brands />  */}
       <Services /> {/* Hizmetler */}
       <About />    {/* Hakkımızda */}
+      <Founders /> 
       <Contact />  {/* İletişim */}
       <Footer />   {/* Footer */}
       

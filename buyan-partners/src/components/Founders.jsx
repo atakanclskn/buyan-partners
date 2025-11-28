@@ -9,26 +9,33 @@ const Founders = () => {
   if (!founders) return null;
 
   return (
-    // Padding'i azalttık (py-12) ki Hero ile çok açılmasın
-    <section id="founders" className="py-12 bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
+    <section id="founders" className="py-16 bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
       
-      {/* Container'ı "max-w-full" ve "px-4" yaparak ekranın kenarlarına yaklaştırdık */}
-      <div className="container mx-auto px-4 max-w-[1600px]">
+      {/* Container genişliğini max-w-6xl yaptık (Daha derli toplu) */}
+      <div className="container mx-auto px-6 max-w-6xl">
         
+        {/* İsteğe bağlı başlık (Eğer config'de varsa gösterir, yoksa gizler) */}
+        {founders.title && (
+           <Reveal>
+             <div className="text-center mb-12">
+               <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{founders.title}</h2>
+             </div>
+           </Reveal>
+        )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {founders.items.map((founder, index) => (
             <Reveal key={founder.id} delay={index * 0.1}>
-              <div className="group relative overflow-hidden rounded-[2rem] shadow-2xl bg-white dark:bg-slate-800 transition-all duration-500 hover:shadow-secondary/20">
+              <div className="group relative overflow-hidden rounded-3xl shadow-xl bg-white dark:bg-slate-800 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
                 
-                {/* GÖRSEL ALANI: 
-                   h-[75vh] -> Ekran yüksekliğinin %75'i kadar yer kapla (Devasa görünüm)
-                   min-h-[600px] -> Mobilde çok küçülmesin
+                {/* GÖRSEL ALANI KÜÇÜLTÜLDÜ:
+                   Eskiden: h-[75vh] (Ekranın %75'i)
+                   Şimdi: h-[500px] (Sabit ve makul bir yükseklik)
                 */}
-                <div className="h-[75vh] min-h-[600px] relative">
+                <div className="h-[500px] relative">
                   
-                  {/* Karartma Gradyanı (Yazıların okunması için alttan siyahlık) */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10 opacity-80 group-hover:opacity-90 transition-opacity duration-500"></div>
+                  {/* Karartma */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10 opacity-60 group-hover:opacity-80 transition-opacity duration-500"></div>
                   
                   <img 
                     src={founder.image} 
@@ -37,12 +44,13 @@ const Founders = () => {
                   />
                 </div>
 
-                {/* BİLGİ ALANI (Resmin üzerine biner) */}
-                <div className="absolute bottom-0 left-0 right-0 p-10 z-20 text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                  <h3 className="text-4xl md:text-5xl font-bold mb-2 tracking-tight">{founder.name}</h3>
-                  <p className="text-secondary text-xl font-medium mb-6 uppercase tracking-widest">{founder.title}</p>
+                {/* BİLGİ ALANI */}
+                <div className="absolute bottom-0 left-0 right-0 p-8 z-20 text-white translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                  <h3 className="text-3xl font-bold mb-1">{founder.name}</h3>
+                  <p className="text-secondary font-medium mb-4 uppercase tracking-wider text-sm">{founder.title}</p>
                   
-                  <p className="text-gray-300 text-lg leading-relaxed mb-8 max-w-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                  {/* Biyografi artık daha az yer kaplıyor ve hover ile netleşiyor */}
+                  <p className="text-gray-200 text-sm leading-relaxed mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75 line-clamp-4">
                     {founder.bio}
                   </p>
                   
@@ -50,10 +58,10 @@ const Founders = () => {
                     href={founder.linkedin} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-3 text-white border border-white/30 px-6 py-3 rounded-full hover:bg-white hover:text-black transition-all duration-300"
+                    className="inline-flex items-center gap-2 text-white hover:text-secondary transition-colors text-sm font-semibold"
                   >
-                    <Linkedin size={20} />
-                    <span className="font-semibold">LinkedIn Profile</span>
+                    <Linkedin size={18} />
+                    <span>LinkedIn Profile</span>
                   </a>
                 </div>
               </div>
