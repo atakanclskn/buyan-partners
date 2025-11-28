@@ -1,12 +1,12 @@
 export const siteConfig = {
-  // GENEL AYARLAR
+  // GENERAL SETTINGS
   general: {
     siteName: "Buyan Partners",
     logoText: "BUYAN PARTNERS", 
-    footerText: "© 2025 Buyan Partners. Tüm hakları saklıdır.",
+    footerText: "© 2025 BUYAN PARTNERS LLC",
   },
 
-  // RENK TEMALARI
+  // THEME SETTINGS
   theme: {
     activeTheme: "kurumsal_mavi", 
     themes: {
@@ -25,25 +25,25 @@ export const siteConfig = {
     }
   },
 
-  // MENÜ
+  // NAVIGATION (MENU)
   navigation: [
-    { id: 1, title: "Ana Sayfa", path: "/" },
-    { id: 2, title: "Hizmetler", path: "#services" },
-    { id: 3, title: "Hakkımızda", path: "#about" },
-    { id: 4, title: "İletişim", path: "#contact" },
+    { id: 1, title: "Home", path: "/" },
+    { id: 2, title: "Services", path: "#services" },
+    { id: 3, title: "About Us", path: "#about" },
+    { id: 4, title: "Contact", path: "#contact" },
   ],
 
-  // ANA SAYFA İÇERİKLERİ (HERO)
+  // HERO SECTION
   hero: {
-    title: "İşletmenizi Büyütmek İçin Stratejik Ortaklık",
-    subtitle: "Buyan Partners ile geleceği bugünden planlayın, potansiyelinizi açığa çıkarın.",
-    buttonText: "Bize Ulaşın",
-    backgroundImage: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80"
+    title: "Strategic Guidance for Market Expansion & Transformation",
+    subtitle: "We design the organizational, operational, and digital foundations required for your long-term success in the global market.",
+    buttonText: "Get in Touch",
+    backgroundImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80"
   },
 
-  // REFERANSLAR / MARKALAR
+  // BRANDS / REFERENCES
   brands: {
-    title: "İş Ortaklarımız",
+    title: "Trusted By Industry Leaders",
     list: [
       { id: 1, name: "TechGlobal", icon: "Box" },
       { id: 2, name: "North Systems", icon: "Hexagon" },
@@ -54,10 +54,10 @@ export const siteConfig = {
     ]
   },
 
-  // HİZMETLER VERİSİ
+  // SERVICES DATA (Already English - Kept as is)
   services: {
     title: "Our Expertise",
-    subtitle: "Tailored solutions for sustainable growth and transformation.",
+    subtitle: "Tailored solutions for sustainable growth and enterprise transformation.",
     items: [
       {
         id: 1,
@@ -134,44 +134,49 @@ export const siteConfig = {
     ]
   },
 
-  // HAKKIMIZDA VERİSİ
+  // ABOUT US (REFRESHED)
   about: {
-    badge: "HAKKIMIZDA",
-    title: "Global Vizyon, Yerel Tecrübe",
-    description: "Buyan Partners olarak, işletmelerin karmaşık pazar dinamiklerinde yollarını bulmalarına yardımcı oluyoruz. Sadece tavsiye vermiyoruz; stratejilerinizi hayata geçirirken yanınızda oluyoruz.",
+    badge: "WHO WE ARE",
+    title: "Global Vision, Local Expertise",
+    description: "At Buyan Partners, we don't just advise; we build. We guide companies through complex market expansions while designing the organizational, operational, and digital foundations required for long-term success. From establishing your entity to transforming your workforce with AI, we are your strategic partner in sustainable growth.",
     stats: [
-      { value: "15+", label: "Yıllık Tecrübe" },
-      { value: "200+", label: "Başarılı Proje" },
-      { value: "50M$", label: "Yönetilen Portföy" }
+      { value: "Global", label: "Market Reach" },
+      { value: "End-to-End", label: "Transformation" },
+      { value: "Strategic", label: "Partnerships" }
     ],
     image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80"
   },
 
-  // İLETİŞİM VERİSİ
+  // CONTACT DATA
   contact: {
-    title: "Bir Kahve İçelim?",
-    subtitle: "Projeleriniz hakkında konuşmak ve size nasıl değer katabileceğimizi tartışmak için sabırsızlanıyoruz.",
-    buttonText: "Mesaj Gönder",
+    title: "Let's Start the Conversation",
+    subtitle: "Ready to expand or transform your business? Reach out to us to discuss how we can drive value for your organization.",
+    buttonText: "Send Message",
+    formLabels: {
+      name: "Full Name",
+      email: "Email Address",
+      message: "Your Message"
+    },
     info: {
       email: "info@buyanpartners.com",
-      phone: "+90 (212) 555 00 00",
-      address: "Levent Mah. Büyükdere Cad. No:199, Şişli/İstanbul",
+      phone: "+1 (000) 000-0000", // ABD formatına uygun örnek
+      address: "New York, NY / Istanbul, TR", // Global duruş için
       mapUrl: "https://maps.google.com"
     }
   },
 
-  // FOOTER VERİSİ
+  // FOOTER DATA
   footer: {
-    description: "İşletmeler için stratejik büyüme ve dijital dönüşüm ortağınız.",
+    description: "Your strategic partner for market entry, organizational excellence, and digital transformation.",
     socials: [
       { id: 1, name: "linkedin", url: "#" },
       { id: 2, name: "twitter", url: "#" },
       { id: 3, name: "instagram", url: "#" }
     ],
     links: [
-      { title: "Gizlilik Politikası", url: "#" },
-      { title: "Kullanım Şartları", url: "#" },
-      { title: "Çerez Politikası", url: "#" }
+      { title: "Privacy Policy", url: "#" },
+      { title: "Terms of Service", url: "#" },
+      { title: "Cookie Policy", url: "#" }
     ]
   }
 };
