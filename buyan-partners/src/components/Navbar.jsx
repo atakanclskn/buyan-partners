@@ -9,7 +9,7 @@ const Navbar = () => {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Scroll Progress
+  // Scroll Progress (İlerleme Çubuğu Ayarları)
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -106,7 +106,7 @@ const Navbar = () => {
             paddingTop: (isScrolled || isMobileMenuOpen) ? "0.75rem" : "1.5rem",
             paddingBottom: (isScrolled || isMobileMenuOpen) ? "0.75rem" : "1.5rem",
           }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
           className="flex justify-between items-center shadow-lg box-border w-full pointer-events-auto z-50 relative overflow-hidden"
         >
           {/* LOGO */}
@@ -188,11 +188,11 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* --- ÖZEL SCROLL BAR (GÜNCELLENDİ) --- */}
-          {/* Light: Siyah, Dark: Beyaz, İncelik: 1.5px */}
+          {/* --- SCROLL PROGRESS BAR (GÜNCELLENDİ) --- */}
+          {/* Light Mode: bg-secondary (Mavi) | Dark Mode: bg-white (Beyaz) */}
           <motion.div
             style={{ scaleX }}
-            className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-black dark:bg-white origin-left z-50 opacity-80"
+            className="absolute bottom-0 left-0 right-0 h-[2px] bg-secondary dark:bg-white origin-left z-50"
           />
 
         </motion.nav>
