@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"; // useRef EKLENDİ
+import { useState, useEffect, useRef } from "react";
 import { useSite } from "../context/SiteContext";
 import { Menu, X, Moon, Sun, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
@@ -9,7 +9,10 @@ const Navbar = () => {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
-  // --- YENİ: SCROLL BAŞLANGIÇ NOKTASI ---
+  // --- MASAÜSTÜ HOVER EFEKTİ İÇİN STATE (GERİ GELDİ) ---
+  const [hoveredTab, setHoveredTab] = useState(null);
+
+  // --- MOBİL MENÜ İÇİN SCROLL BAŞLANGIÇ NOKTASI ---
   const scrollStartRef = useRef(0); 
 
   // Scroll Progress
@@ -27,7 +30,7 @@ const Navbar = () => {
     return false;
   });
 
-  // 1. Efekt: Navbar Şekli (Hap/Tam)
+  // 1. Efekt: Navbar Şekli
   useEffect(() => {
     const handleScroll = () => {
       const heroHeight = window.innerHeight - 100;
@@ -39,25 +42,21 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 2. Efekt: Menü açıldığında scroll konumunu kaydet
+  // 2. Efekt: Menü açıldığında konumu kaydet
   useEffect(() => {
     if (isMobileMenuOpen) {
-      scrollStartRef.current = window.scrollY; // Açıldığı noktayı hafızaya al
+      scrollStartRef.current = window.scrollY;
     }
   }, [isMobileMenuOpen]);
 
-  // 3. Efekt: Akıllı Kapatma (Toleranslı)
+  // 3. Efekt: Akıllı Kapatma (100px Tolerans)
   useEffect(() => {
     if (!isMobileMenuOpen) return;
 
     const handleSmartClose = () => {
       const currentScroll = window.scrollY;
-      // Ne kadar kaydırdı? (Mutlak değer: Aşağı veya yukarı)
       const distance = Math.abs(currentScroll - scrollStartRef.current);
 
-      // EŞİK DEĞER: 100px
-      // Kullanıcı 100px'den fazla kaydırırsa menüyü kapat.
-      // Ufak dokunuşlarda (10-20px) kapanmaz.
       if (distance > 100) {
         setIsMobileMenuOpen(false);
       }
@@ -119,7 +118,7 @@ const Navbar = () => {
     <>
       <div className="fixed top-0 left-0 right-0 z-50 flex flex-col items-center pointer-events-none">
         
-        {/* --- ANA NAVBAR --- */}
+        {/* --- 1. ANA NAVBAR --- */}
         <motion.nav
           initial={false}
           animate={{
@@ -142,7 +141,7 @@ const Navbar = () => {
           className="flex justify-between items-center shadow-lg box-border w-full pointer-events-auto z-50 relative overflow-hidden"
         >
           {/* LOGO */}
-          <div className="text-2xl font-bold cursor-pointer shrink-0 whitespace-nowrap">
+          <div className="text-2xl font-bold cursor-pointer shrink-0 whitespace-nowrap z-10">
             <a
               href="/"
               onClick={handleScrollToTop}
@@ -154,29 +153,43 @@ const Navbar = () => {
             </a>
           </div>
 
-          {/* MASAÜSTÜ MENÜ */}
-          <div className="hidden md:flex items-center space-x-8 font-medium whitespace-nowrap">
+          {/* --- MASAÜSTÜ MENÜ (KAYAN HAP EFEKTİ GERİ GELDİ) --- */}
+          <div className="hidden md:flex items-center space-x-2 font-medium whitespace-nowrap z-10" 
+               onMouseLeave={() => setHoveredTab(null)}>
+            
             {navigation.map((item) => (
               <a
                 key={item.id}
                 href={item.path}
                 onClick={(e) => handleLinkClick(e, item.path)}
-                className={`relative group py-2 transition-colors duration-300
+                onMouseEnter={() => setHoveredTab(item.id)}
+                className={`relative px-4 py-2 rounded-full transition-colors duration-300
                   ${
                     isScrolled
-                      ? "text-gray-700 dark:text-gray-200 hover:text-secondary"
-                      : "text-white/90 hover:text-white"
+                      ? "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                      : "text-white/80 hover:text-white"
                   }
                 `}
               >
-                {item.title}
-                <span className="absolute bottom-0 left-0 w-full h-[2px] bg-secondary rounded-full origin-center scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span>
+                <span className="relative z-10">{item.title}</span>
+
+                {/* SİHİRLİ ARKA PLAN HAPI (Initial Scale ile) */}
+                {hoveredTab === item.id && (
+                  <motion.span
+                    layoutId="nav-pill"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="absolute inset-0 rounded-full bg-gray-200/50 dark:bg-white/10 backdrop-blur-sm -z-0"
+                  />
+                )}
               </a>
             ))}
 
+            {/* DARK MODE */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className={`ml-4 p-2 rounded-full transition-all cursor-pointer overflow-hidden border
+              className={`ml-2 p-2 rounded-full transition-all cursor-pointer overflow-hidden border
                 ${
                   isScrolled
                     ? "bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white"
@@ -196,7 +209,7 @@ const Navbar = () => {
           </div>
 
           {/* MOBİL BUTONLAR */}
-          <div className="md:hidden flex items-center gap-4">
+          <div className="md:hidden flex items-center gap-4 z-10">
              <button
               onClick={() => setDarkMode(!darkMode)}
               className={`p-2 rounded-full transition-all cursor-pointer overflow-hidden border
@@ -220,7 +233,7 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* SCROLL BAR */}
+          {/* --- SCROLL PROGRESS BAR --- */}
           <motion.div
             style={{ scaleX }}
             className="absolute bottom-0 left-0 right-0 h-[2px] bg-secondary dark:bg-white origin-left z-50"
@@ -228,7 +241,7 @@ const Navbar = () => {
 
         </motion.nav>
 
-        {/* --- MOBİL MENÜ --- */}
+        {/* --- 2. MOBİL MENÜ (BÜTÜNLEŞİK KART + SLIDE) --- */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
@@ -243,9 +256,11 @@ const Navbar = () => {
                 borderWidth: "1px",
                 borderStyle: "solid",
                 borderColor: glassStyle.borderColor,
-                borderTop: "none",
+                
+                borderTop: "none", 
                 borderRadius: "0px 0px 24px 24px", 
                 marginTop: "-1px", 
+                
                 width: currentWidth,
                 maxWidth: maxWidth,
               }}
