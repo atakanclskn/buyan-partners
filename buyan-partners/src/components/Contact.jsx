@@ -18,11 +18,12 @@ const Contact = () => {
   const [errors, setErrors] = useState({});
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  // İngilizce Konu Başlıkları
   const subjectOptions = [
-    "Proje Danışmanlığı",
-    "Fiyat Teklifi",
-    "Genel Bilgi",
-    "İş Ortaklığı"
+    "Project Consulting",
+    "Request for Quotation",
+    "General Inquiry",
+    "Partnership Proposal"
   ];
 
   const handleChange = (e) => {
@@ -50,10 +51,11 @@ const Contact = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Lütfen adınızı giriniz.";
-    if (!formData.email.trim()) newErrors.email = "Email adresi zorunludur.";
-    if (!formData.subject) newErrors.subject = "Lütfen bir konu seçiniz.";
-    if (!formData.message.trim()) newErrors.message = "Mesaj içeriği boş olamaz.";
+    // İngilizce Hata Mesajları
+    if (!formData.name.trim()) newErrors.name = "Name is required.";
+    if (!formData.email.trim()) newErrors.email = "Email address is required.";
+    if (!formData.subject) newErrors.subject = "Please select a subject.";
+    if (!formData.message.trim()) newErrors.message = "Message cannot be empty.";
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -69,7 +71,7 @@ const Contact = () => {
 
     const mailSubject = encodeURIComponent(`${subject} - ${name}`);
     const mailBody = encodeURIComponent(
-      `Gönderen: ${name}\nEmail: ${email}\n\nMesaj:\n${message}`
+      `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
     );
 
     window.location.href = `mailto:${targetEmail}?subject=${mailSubject}&body=${mailBody}`;
@@ -82,7 +84,7 @@ const Contact = () => {
         <Reveal>
           <div className="grid grid-cols-1 lg:grid-cols-3 rounded-3xl overflow-hidden shadow-2xl border border-transparent dark:border-slate-700/50">
             
-            {/* SOL TARAF */}
+            {/* SOL TARAF (Bilgi Paneli) */}
             <div className="bg-primary dark:bg-slate-800 text-white p-12 lg:p-16 lg:col-span-1 flex flex-col justify-between relative z-10 transition-colors duration-300">
               <div>
                 <h3 className="text-3xl font-bold mb-6">{contact.title}</h3>
@@ -102,7 +104,7 @@ const Contact = () => {
                   <div className="flex items-start space-x-4">
                     <Phone className="w-6 h-6 text-secondary mt-1" />
                     <div>
-                      <p className="text-sm text-white/60 uppercase tracking-wider font-semibold">Telefon</p>
+                      <p className="text-sm text-white/60 uppercase tracking-wider font-semibold">Phone</p>
                       <p className="text-lg">{contact.info.phone}</p>
                     </div>
                   </div>
@@ -110,7 +112,7 @@ const Contact = () => {
                   <div className="flex items-start space-x-4">
                     <MapPin className="w-6 h-6 text-secondary mt-1" />
                     <div>
-                      <p className="text-sm text-white/60 uppercase tracking-wider font-semibold">Ofis</p>
+                      <p className="text-sm text-white/60 uppercase tracking-wider font-semibold">Office</p>
                       <p className="text-lg max-w-xs">{contact.info.address}</p>
                     </div>
                   </div>
@@ -120,7 +122,7 @@ const Contact = () => {
               <div className="mt-12 pt-12 border-t border-white/10">
                 <div className="flex items-center space-x-2 text-white/60">
                   <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                  <span className="text-sm">Şu an yeni projeler için müsaitiz</span>
+                  <span className="text-sm">We are currently available for new projects</span>
                 </div>
               </div>
             </div>
@@ -133,18 +135,18 @@ const Contact = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* İSİM */}
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors">Adınız Soyadınız</label>
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors">
+                      {contact.formLabels.name}
+                    </label>
                     <input 
                       type="text" 
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      // transition-all YERİNE transition-colors KULLANDIK (Kasmayı engeller)
-                      // placeholder renklerini ekledik
                       className={`w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-700 border text-gray-900 dark:text-white focus:border-secondary outline-none transition-colors duration-300 placeholder:text-gray-400 dark:placeholder:text-gray-500
                         ${errors.name ? 'border-red-500 bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-slate-600'}
                       `}
-                      placeholder="Örn: Ahmet Yılmaz" 
+                      placeholder="Ex: John Doe" 
                     />
                     <AnimatePresence>
                       {errors.name && (
@@ -157,7 +159,9 @@ const Contact = () => {
 
                   {/* EMAIL */}
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors">Email Adresiniz</label>
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors">
+                      {contact.formLabels.email}
+                    </label>
                     <input 
                       type="email" 
                       name="email"
@@ -166,7 +170,7 @@ const Contact = () => {
                       className={`w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-700 border text-gray-900 dark:text-white focus:border-secondary outline-none transition-colors duration-300 placeholder:text-gray-400 dark:placeholder:text-gray-500
                         ${errors.email ? 'border-red-500 bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-slate-600'}
                       `}
-                      placeholder="ahmet@sirket.com" 
+                      placeholder="john@company.com" 
                     />
                     <AnimatePresence>
                       {errors.email && (
@@ -180,7 +184,7 @@ const Contact = () => {
 
                 {/* KONU */}
                 <div className="space-y-2 relative">
-                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors">Konu</label>
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors">Subject</label>
                   <div 
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     className={`w-full px-4 py-3 rounded-lg border cursor-pointer flex justify-between items-center transition-colors duration-300 hover:border-secondary
@@ -190,7 +194,7 @@ const Contact = () => {
                     `}
                   >
                     <span className={formData.subject ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}>
-                      {formData.subject || "Bir konu seçiniz..."}
+                      {formData.subject || "Select a subject..."}
                     </span>
                     <ChevronDown size={20} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''} ${formData.subject ? 'text-gray-500' : 'text-gray-400'}`} />
                   </div>
@@ -228,19 +232,19 @@ const Contact = () => {
                 </div>
 
                 {/* MESAJ */}
-                {/* MESAJ ALANI */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors">Mesajınız</label>
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors">
+                    {contact.formLabels.message}
+                  </label>
                   <textarea 
                     rows="4" 
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    // DEĞİŞİKLİK: 'min-h-[150px]' ekledik. Artık 150px'den daha küçük olamaz.
                     className={`w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-700 border text-gray-900 dark:text-white focus:border-secondary outline-none transition-colors duration-300 resize-y placeholder:text-gray-400 dark:placeholder:text-gray-500 min-h-[150px]
                       ${errors.message ? 'border-red-500 bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-slate-600'}
                     `}
-                    placeholder="Projenizden bahsedin..."
+                    placeholder="Tell us about your project..."
                   ></textarea>
                   <AnimatePresence>
                     {errors.message && (

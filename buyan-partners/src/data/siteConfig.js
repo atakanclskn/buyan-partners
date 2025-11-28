@@ -3,7 +3,7 @@ export const siteConfig = {
   general: {
     siteName: "Buyan Partners",
     logoText: "BUYAN PARTNERS", 
-    footerText: "© 2025 BUYAN PARTNERS LLC",
+    footerText: "© 2025 Buyan Partners. All rights reserved.",
   },
 
   // THEME SETTINGS
@@ -54,7 +54,7 @@ export const siteConfig = {
     ]
   },
 
-  // SERVICES DATA (Already English - Kept as is)
+  // SERVICES DATA
   services: {
     title: "Our Expertise",
     subtitle: "Tailored solutions for sustainable growth and enterprise transformation.",
@@ -134,11 +134,11 @@ export const siteConfig = {
     ]
   },
 
-  // ABOUT US (REFRESHED)
+  // ABOUT US
   about: {
     badge: "WHO WE ARE",
     title: "Global Vision, Local Expertise",
-    description: "At Buyan Partners, we don't just advise; we build. We guide companies through complex market expansions while designing the organizational, operational, and digital foundations required for long-term success. From establishing your entity to transforming your workforce with AI, we are your strategic partner in sustainable growth.",
+    description: "At BUYAN PARTNERS LLC, we guide companies through market expansion while designing the organizational, operational, and digital foundations required for long-term success. Our offerings are structured around three core advisory pillars that enable sustainable growth and enterprise transformation.",
     stats: [
       { value: "Global", label: "Market Reach" },
       { value: "End-to-End", label: "Transformation" },
@@ -147,7 +147,7 @@ export const siteConfig = {
     image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80"
   },
 
-  // CONTACT DATA
+  // CONTACT DATA (UPDATED PLACEHOLDERS)
   contact: {
     title: "Let's Start the Conversation",
     subtitle: "Ready to expand or transform your business? Reach out to us to discuss how we can drive value for your organization.",
@@ -159,8 +159,8 @@ export const siteConfig = {
     },
     info: {
       email: "info@buyanpartners.com",
-      phone: "+1 (000) 000-0000", // ABD formatına uygun örnek
-      address: "New York, NY / Istanbul, TR", // Global duruş için
+      phone: "+1 (000) 000-0000", // Placeholder Numara
+      address: "Atlanta, GA, USA", // Placeholder Adres
       mapUrl: "https://maps.google.com"
     }
   },
