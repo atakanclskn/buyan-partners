@@ -16,9 +16,10 @@ const Login = ({ onClose, onLoginSuccess }) => {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      onLoginSuccess(); // Giriş başarılı olursa paneli aç
+      onLoginSuccess(); // Open panel on success
     } catch (err) {
-      setError("Hatalı email veya şifre!");
+      // Hata mesajını İngilizce yaptık
+      setError("Invalid email or password!");
     } finally {
       setLoading(false);
     }
@@ -28,7 +29,7 @@ const Login = ({ onClose, onLoginSuccess }) => {
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
       <div className="bg-white dark:bg-slate-900 w-full max-w-md p-8 rounded-3xl shadow-2xl border border-gray-200 dark:border-slate-700 relative">
         
-        {/* Kapatma Butonu */}
+        {/* Close Button */}
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors"
@@ -40,15 +41,17 @@ const Login = ({ onClose, onLoginSuccess }) => {
           <div className="bg-secondary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-secondary">
             <Lock size={32} />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Yönetici Girişi</h2>
+          {/* Başlıklar İngilizce */}
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Login</h2>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
-            İçerikleri düzenlemek için giriş yapın.
+            Sign in to manage website content.
           </p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Email</label>
+            {/* Etiket İngilizce */}
+            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Email Address</label>
             <div className="relative">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
               <input 
@@ -62,7 +65,8 @@ const Login = ({ onClose, onLoginSuccess }) => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Şifre</label>
+            {/* Etiket İngilizce */}
+            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Password</label>
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
               <input 
@@ -81,12 +85,13 @@ const Login = ({ onClose, onLoginSuccess }) => {
             </div>
           )}
 
+          {/* Buton Metinleri İngilizce */}
           <button 
             type="submit" 
             disabled={loading}
             className="w-full bg-secondary text-white font-bold py-4 rounded-xl hover:bg-secondary/90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-secondary/25"
           >
-            {loading ? "Giriş Yapılıyor..." : "Panele Git"}
+            {loading ? "Signing In..." : "Go to Panel"}
             {!loading && <ArrowRight size={20} />}
           </button>
         </form>
