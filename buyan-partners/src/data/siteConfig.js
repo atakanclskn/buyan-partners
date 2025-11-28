@@ -41,25 +41,25 @@ export const siteConfig = {
     backgroundImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80"
   },
 
-// FOUNDERS / LEADERSHIP TEAM
+  // FOUNDERS / LEADERSHIP TEAM (UPDATED TO ENGLISH)
   founders: {
-    title: "Meet Our Leadership",
-    subtitle: "Visionary leaders guiding global success.",
+    // Title is hidden in component but kept here for reference
+    title: "Meet Our Leadership", 
     items: [
       {
         id: 1,
-        name: "Oya Buyan",
+        name: "FULL NAME",
         title: "Managing Partner",
-        bio: "A seasoned strategist with extensive experience in international business development and organizational transformation. She specializes in guiding companies through complex market entries and building high-performance cultures.",
-        image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800",
+        bio: " xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx.",
+        image: "", 
         linkedin: "#"
       },
       {
         id: 2,
-        name: "Teoman Buyan",
+        name: "FULL NAME",
         title: "Managing Partner",
-        bio: "An expert in digital transformation and operational excellence, leveraging technology and data to drive sustainable growth. His focus includes enterprise AI adoption, ERP optimization, and workforce digital capability.",
-        image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=800",
+        bio: "Executive biography will be placed here. An expert in digital transformation and operational excellence, leveraging technology and data to drive sustainable growth. Focus includes enterprise AI adoption, ERP optimization, and workforce digital capability. xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx.",
+        image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=1200",
         linkedin: "#"
       }
     ]
@@ -171,7 +171,7 @@ export const siteConfig = {
     image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80"
   },
 
-  // CONTACT DATA (UPDATED PLACEHOLDERS)
+  // CONTACT DATA
   contact: {
     title: "Let's Start the Conversation",
     subtitle: "Ready to expand or transform your business? Reach out to us to discuss how we can drive value for your organization.",
@@ -183,13 +183,13 @@ export const siteConfig = {
     },
     info: {
       email: "info@buyanpartners.com",
-      phone: "+1 (000) 000-0000", // Placeholder Numara
-      address: "Atlanta, GA, USA", // Placeholder Adres
+      phone: "+1 (000) 000-0000",
+      address: "Atlanta, GA, USA",
       mapUrl: "https://maps.google.com"
     }
   },
 
-// FOOTER DATA
+  // FOOTER DATA
   footer: {
     description: "Your strategic partner for market entry, organizational excellence, and digital transformation.",
     labels: {
@@ -199,9 +199,9 @@ export const siteConfig = {
     },
     socials: [
       { id: 1, name: "linkedin", url: "#" },
-      { id: 2, name: "x", url: "#" }, 
+      { id: 2, name: "x", url: "#" },
       { id: 3, name: "instagram", url: "#" },
-      { id: 4, name: "facebook", url: "#" } 
+      { id: 4, name: "facebook", url: "#" }
     ],
     links: [
       { title: "Privacy Policy", url: "#" },
