@@ -137,7 +137,7 @@ const Navbar = () => {
             paddingTop: (isScrolled || isMobileMenuOpen) ? "0.75rem" : "1.5rem",
             paddingBottom: (isScrolled || isMobileMenuOpen) ? "0.75rem" : "1.5rem",
           }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
           className="flex justify-between items-center shadow-lg box-border w-full pointer-events-auto z-50 relative overflow-hidden"
         >
           {/* LOGO */}
