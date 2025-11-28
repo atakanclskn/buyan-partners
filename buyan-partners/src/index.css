@@ -10,7 +10,38 @@
   --color-text: var(--color-text);
 }
 
-/* Sayfa geçişlerinde göz yorulmasın diye yumuşak geçiş ekleyelim */
 html {
-  transition: background-color 0.3s, color 0.3s;
+  /* 1. Işınlanmayı engeller, kayarak gitmesini sağlar */
+  scroll-behavior: smooth;
+  
+  /* 2. Navbar sabit olduğu için başlıkların altında kalmasını engeller */
+  /* Navbar yüksekliğine göre (yaklaşık 100px) bir boşluk bırakır */
+  scroll-padding-top: 100px;
 }
+
+/* Custom Scrollbar (İsteğe bağlı, şık durur) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 5px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
