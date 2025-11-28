@@ -168,7 +168,6 @@ export const siteConfig = {
 // FOOTER DATA
   footer: {
     description: "Your strategic partner for market entry, organizational excellence, and digital transformation.",
-    // YENİ: Başlıklar ve Etiketler (İngilizce)
     labels: {
       menu: "Menu",
       legal: "Legal",
@@ -176,9 +175,9 @@ export const siteConfig = {
     },
     socials: [
       { id: 1, name: "linkedin", url: "#" },
-      { id: 2, name: "x", url: "#" }, // Twitter yerine X
+      { id: 2, name: "x", url: "#" }, 
       { id: 3, name: "instagram", url: "#" },
-      { id: 4, name: "facebook", url: "#" } // Eksik olanı ekledik
+      { id: 4, name: "facebook", url: "#" } 
     ],
     links: [
       { title: "Privacy Policy", url: "#" },
