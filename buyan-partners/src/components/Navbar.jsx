@@ -7,9 +7,19 @@ const Navbar = () => {
   const { config, darkMode, setDarkMode } = useSite();
   const { navigation, general } = config;
 
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // --- KRİTİK DÜZELTME 1: STATE BAŞLANGICI ---
+  // Varsayılan olarak 'false' demek yerine, o anki konumu kontrol ederek başlıyoruz.
+  // Böylece sayfa yenilendiğinde veya Preloader bittiğinde Navbar "şaşırmaz".
+  const [isScrolled, setIsScrolled] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.scrollY > (window.innerHeight - 100);
+    }
+    return false;
+  });
+
+  // Scroll Takibi (Değişiklikleri yakalamak için)
   useEffect(() => {
     const handleScroll = () => {
       const heroHeight = window.innerHeight - 100;
@@ -17,9 +27,13 @@ const Navbar = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
+    // İlk açılışta da bir kez tetikleyelim ki garanti olsun
+    handleScroll();
+    
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Mobil Menü Kilidi
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -28,14 +42,13 @@ const Navbar = () => {
     }
   }, [isMobileMenuOpen]);
 
-  // --- YENİ: YUMUŞAK SCROLL FONKSİYONU ---
+  // Yumuşak Scroll
   const handleScrollToTop = (e) => {
-    e.preventDefault(); // Işınlanmayı (varsayılan davranışı) engelle
-    window.scrollTo({ top: 0, behavior: "smooth" }); // Yağ gibi kay
-    setIsMobileMenuOpen(false); // Mobildeysek menüyü kapat
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setIsMobileMenuOpen(false);
   };
 
-  // Link Tıklama Yöneticisi (Home ise yukarı, değilse normal git)
   const handleLinkClick = (e, path) => {
     if (path === "/") {
       handleScrollToTop(e);
@@ -46,11 +59,14 @@ const Navbar = () => {
 
   return (
     <>
-      {/* --- NAVBAR WRAPPER --- */}
       <div className="fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-300 pointer-events-none">
         
         <motion.nav
-          // ANİMASYON HEDEFLERİ
+          // --- KRİTİK DÜZELTME 2: INITIAL FALSE ---
+          // Bu ayar, bileşen ilk ekrana geldiğinde animasyon oynatmasını engeller.
+          // Direkt olarak 'animate' içindeki doğru değerlerle başlar.
+          initial={false} 
+          
           animate={{
             y: isScrolled ? 20 : 0,
             width: isScrolled ? "85%" : "100%",
@@ -83,11 +99,11 @@ const Navbar = () => {
               : "none",
           }}
         >
-          {/* LOGO (Tıklanınca Yumuşakça En Başa Döner) */}
+          {/* LOGO */}
           <div className="text-2xl font-bold cursor-pointer shrink-0 whitespace-nowrap">
             <a
               href="/"
-              onClick={handleScrollToTop} 
+              onClick={handleScrollToTop}
               className={`${
                 isScrolled ? "text-gray-900 dark:text-white" : "text-white"
               } transition-colors duration-300`}
@@ -102,7 +118,7 @@ const Navbar = () => {
               <a
                 key={item.id}
                 href={item.path}
-                onClick={(e) => handleLinkClick(e, item.path)} 
+                onClick={(e) => handleLinkClick(e, item.path)}
                 className={`relative group transition-colors duration-300
                   ${
                     isScrolled
@@ -116,7 +132,7 @@ const Navbar = () => {
               </a>
             ))}
 
-            {/* DARK MODE BUTONU */}
+            {/* DARK MODE */}
             <button
               onClick={() => setDarkMode(!darkMode)}
               className={`ml-4 p-2 rounded-full transition-all cursor-pointer overflow-hidden border
@@ -186,8 +202,7 @@ const Navbar = () => {
                 <a
                   key={item.id}
                   href={item.path}
-                  // MOBİLDE DE AYNI MANTIK: Home ise yukarı kay, değilse git.
-                  onClick={(e) => handleLinkClick(e, item.path)} 
+                  onClick={(e) => handleLinkClick(e, item.path)}
                   className="text-3xl font-bold text-gray-900 dark:text-white hover:text-secondary transition-colors"
                 >
                   {item.title}
