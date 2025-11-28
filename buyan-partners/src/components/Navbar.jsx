@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"; // useRef EKLENDİ
 import { useSite } from "../context/SiteContext";
 import { Menu, X, Moon, Sun, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
@@ -8,8 +8,11 @@ const Navbar = () => {
   const { navigation, general } = config;
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  // --- YENİ: SCROLL BAŞLANGIÇ NOKTASI ---
+  const scrollStartRef = useRef(0); 
 
-  // --- SCROLL PROGRESS AYARLARI ---
+  // Scroll Progress
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -17,7 +20,6 @@ const Navbar = () => {
     restDelta: 0.001
   });
 
-  // --- SCROLL DURUMU TAKİBİ (NAVBAR ŞEKLİ İÇİN) ---
   const [isScrolled, setIsScrolled] = useState(() => {
     if (typeof window !== "undefined") {
       return window.scrollY > (window.innerHeight - 100);
@@ -25,7 +27,7 @@ const Navbar = () => {
     return false;
   });
 
-  // 1. Efekt: Navbar'ın şeklini (Hap/Tam) ayarlar
+  // 1. Efekt: Navbar Şekli (Hap/Tam)
   useEffect(() => {
     const handleScroll = () => {
       const heroHeight = window.innerHeight - 100;
@@ -33,22 +35,36 @@ const Navbar = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // İlk açılışta kontrol et
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 2. Efekt: Menü açıkken scroll yapılırsa menüyü kapat (DÜZELTİLDİ)
+  // 2. Efekt: Menü açıldığında scroll konumunu kaydet
   useEffect(() => {
-    if (!isMobileMenuOpen) return; // Menü kapalıysa dinleme yapma
+    if (isMobileMenuOpen) {
+      scrollStartRef.current = window.scrollY; // Açıldığı noktayı hafızaya al
+    }
+  }, [isMobileMenuOpen]);
 
-    const closeMenuOnScroll = () => {
-      setIsMobileMenuOpen(false);
+  // 3. Efekt: Akıllı Kapatma (Toleranslı)
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+
+    const handleSmartClose = () => {
+      const currentScroll = window.scrollY;
+      // Ne kadar kaydırdı? (Mutlak değer: Aşağı veya yukarı)
+      const distance = Math.abs(currentScroll - scrollStartRef.current);
+
+      // EŞİK DEĞER: 100px
+      // Kullanıcı 100px'den fazla kaydırırsa menüyü kapat.
+      // Ufak dokunuşlarda (10-20px) kapanmaz.
+      if (distance > 100) {
+        setIsMobileMenuOpen(false);
+      }
     };
 
-    window.addEventListener("scroll", closeMenuOnScroll);
-    
-    // Temizleme: Menü kapanınca dinleyiciyi kaldır
-    return () => window.removeEventListener("scroll", closeMenuOnScroll);
+    window.addEventListener("scroll", handleSmartClose);
+    return () => window.removeEventListener("scroll", handleSmartClose);
   }, [isMobileMenuOpen]);
 
   const handleScrollToTop = (e) => {
@@ -84,7 +100,6 @@ const Navbar = () => {
 
   const currentWidth = (isScrolled || isMobileMenuOpen) ? "90%" : "100%";
   const maxWidth = (isScrolled || isMobileMenuOpen) ? "1000px" : "100%";
-  
   const topBarRadius = isMobileMenuOpen 
     ? "24px 24px 0px 0px" 
     : (isScrolled ? "50px" : "0px");
@@ -104,7 +119,7 @@ const Navbar = () => {
     <>
       <div className="fixed top-0 left-0 right-0 z-50 flex flex-col items-center pointer-events-none">
         
-        {/* --- 1. ANA NAVBAR --- */}
+        {/* --- ANA NAVBAR --- */}
         <motion.nav
           initial={false}
           animate={{
@@ -155,7 +170,6 @@ const Navbar = () => {
                 `}
               >
                 {item.title}
-                {/* Premium Hover Efekti */}
                 <span className="absolute bottom-0 left-0 w-full h-[2px] bg-secondary rounded-full origin-center scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span>
               </a>
             ))}
@@ -206,7 +220,7 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* --- SCROLL PROGRESS BAR --- */}
+          {/* SCROLL BAR */}
           <motion.div
             style={{ scaleX }}
             className="absolute bottom-0 left-0 right-0 h-[2px] bg-secondary dark:bg-white origin-left z-50"
@@ -229,11 +243,9 @@ const Navbar = () => {
                 borderWidth: "1px",
                 borderStyle: "solid",
                 borderColor: glassStyle.borderColor,
-                
-                borderTop: "none", 
+                borderTop: "none",
                 borderRadius: "0px 0px 24px 24px", 
                 marginTop: "-1px", 
-                
                 width: currentWidth,
                 maxWidth: maxWidth,
               }}
