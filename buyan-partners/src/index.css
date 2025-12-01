@@ -48,4 +48,46 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
-
+/* --- ADMIN PANEL STYLES --- */
+.admin-input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background-color: transparent;
+  border-width: 1px;
+  border-color: #e5e7eb;
+  outline: none;
+  transition: all 0.2s;
+}
+.dark .admin-input {
+  border-color: #475569;
+  background-color: #1e293b;
+  color: white;
+}
+.admin-input:focus {
+  border-color: #3b82f6;
+  ring: 2px solid #3b82f6;
+}
+.admin-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+.admin-btn-add {
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: background-color 0.2s;
+}
+.admin-btn-add:hover {
+  background-color: #2563eb;
+}
