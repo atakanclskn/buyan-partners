@@ -1,17 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
 import { db } from '../firebase';
-import { doc, updateDoc } from 'firebase/firestore';
-import { X, Save, Layout, Type, Briefcase, Users, Phone, Plus, Trash2, Edit3, ArrowLeft, Palette, Check, Share2, Link } from 'lucide-react';
+import { doc, updateDoc, collection, onSnapshot, query, orderBy, deleteDoc } from 'firebase/firestore';
+import { X, Save, Layout, Type, Briefcase, Users, Phone, Plus, Trash2, Edit3, ArrowLeft, Palette, Check, Share2, Inbox, Mail, Clock } from 'lucide-react';
 import * as Icons from 'lucide-react'; 
 import IconPicker from './IconPicker';
 
-// Helper: Dinamik İkon Önizleme
+// Helper: Dynamic Icon Preview
 const DynamicIconPreview = ({ name }) => {
   const Icon = Icons[name] || Icons.HelpCircle;
   return <Icon size={20} />;
 };
 
+// --- THEME PRESETS ---
 const COLOR_PRESETS = [
   { name: "Corporate Blue", primary: "#0f172a", secondary: "#3b82f6" },
   { name: "Premium Gold", primary: "#000000", secondary: "#d4af37" },
@@ -25,7 +26,7 @@ const COLOR_PRESETS = [
   { name: "Executive Bronze", primary: "#27272a", secondary: "#b45309" },
 ];
 
-// --- GENİŞLETİLMİŞ SOSYAL MEDYA LİSTESİ ---
+// --- SOCIAL MEDIA PLATFORMS ---
 const SOCIAL_PLATFORMS = [
   { label: "LinkedIn", value: "linkedin" },
   { label: "X (Twitter)", value: "x" },
@@ -44,13 +45,45 @@ const SOCIAL_PLATFORMS = [
 
 const AdminPanel = ({ onClose }) => {
   const { config } = useSite();
-  const [activeTab, setActiveTab] = useState('hero');
+  
+  // State Management
+  const [activeTab, setActiveTab] = useState('inbox'); // Start with Inbox
   const [formData, setFormData] = useState(JSON.parse(JSON.stringify(config))); 
   const [saving, setSaving] = useState(false);
+
+  // Sub-Editors State
   const [editingServiceId, setEditingServiceId] = useState(null); 
   const [pickingIconFor, setPickingIconFor] = useState(null); 
 
-  // --- GÜNCELLEME FONKSİYONLARI ---
+  // Inbox State
+  const [messages, setMessages] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+
+  // --- FETCH MESSAGES (Real-Time) ---
+  useEffect(() => {
+    if (activeTab === 'inbox') {
+      setLoadingMessages(true);
+      const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const msgs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setMessages(msgs);
+        setLoadingMessages(false);
+      });
+      return () => unsubscribe();
+    }
+  }, [activeTab]);
+
+  const handleDeleteMessage = async (id) => {
+    if(!window.confirm("Are you sure you want to delete this message?")) return;
+    try { await deleteDoc(doc(db, "messages", id)); } catch (error) { alert("Error: " + error.message); }
+  };
+
+  const formatDate = (timestamp) => {
+    if (!timestamp) return "Just now";
+    return new Date(timestamp.seconds * 1000).toLocaleString();
+  };
+
+  // --- GENERAL UPDATES ---
   const handleChange = (section, key, value) => {
     setFormData(prev => ({ ...prev, [section]: { ...prev[section], [key]: value } }));
   };
@@ -59,6 +92,7 @@ const AdminPanel = ({ onClose }) => {
     setFormData(prev => ({ ...prev, general: { ...prev.general, [key]: value } }));
   };
 
+  // --- ARRAY MANAGERS ---
   const handleArrayChange = (section, index, key, value) => {
     const newList = [...formData[section].items];
     newList[index] = { ...newList[index], [key]: value };
@@ -71,34 +105,30 @@ const AdminPanel = ({ onClose }) => {
   };
 
   const handleDeleteItem = (section, index) => {
-    if(!window.confirm("Are you sure?")) return;
+    if(!window.confirm("Delete this item?")) return;
     const newList = formData[section].items.filter((_, i) => i !== index);
     setFormData(prev => ({ ...prev, [section]: { ...prev[section], items: newList } }));
   };
 
+  // --- FOOTER SPECIAL ---
   const handleFooterArrayChange = (arrayName, index, key, value) => {
     const newList = [...formData.footer[arrayName]];
     newList[index] = { ...newList[index], [key]: value };
-    setFormData(prev => ({
-      ...prev,
-      footer: { ...prev.footer, [arrayName]: newList }
-    }));
+    setFormData(prev => ({ ...prev, footer: { ...prev.footer, [arrayName]: newList } }));
   };
 
   const handleAddFooterItem = (arrayName, template) => {
     const newItem = { id: Date.now(), ...template };
-    setFormData(prev => ({
-      ...prev,
-      footer: { ...prev.footer, [arrayName]: [...prev.footer[arrayName], newItem] }
-    }));
+    setFormData(prev => ({ ...prev, footer: { ...prev.footer, [arrayName]: [...prev.footer[arrayName], newItem] } }));
   };
 
   const handleDeleteFooterItem = (arrayName, index) => {
-    if(!window.confirm("Delete this item?")) return;
+    if(!window.confirm("Delete?")) return;
     const newList = formData.footer[arrayName].filter((_, i) => i !== index);
     setFormData(prev => ({ ...prev, footer: { ...prev.footer, [arrayName]: newList } }));
   };
 
+  // --- SPECIFIC HANDLERS ---
   const handleContactInfoChange = (key, value) => {
     setFormData(prev => ({ ...prev, contact: { ...prev.contact, info: { ...prev.contact.info, [key]: value } } }));
   };
@@ -131,20 +161,24 @@ const AdminPanel = ({ onClose }) => {
     }
   };
 
+  // --- SAVE TO FIREBASE ---
   const handleSave = async (sectionName) => {
     setSaving(true);
     try {
       const docRef = doc(db, "site-content", sectionName);
       let dataToSave = formData[sectionName];
+      
+      // Clean up service lists
       if (sectionName === 'services') {
         dataToSave.items = dataToSave.items.map(item => ({
           ...item,
           details: item.details.map(detail => ({ ...detail, list: Array.isArray(detail.list) ? detail.list.filter(l => l.trim() !== '') : [] }))
         }));
       }
+
       await updateDoc(docRef, dataToSave);
       
-      // Footer'da logo metnini de kaydediyoruz (General koleksiyonunda)
+      // If saving footer, also save general (for logo text)
       if (sectionName === 'footer') {
         const generalRef = doc(db, "site-content", "general");
         await updateDoc(generalRef, formData.general);
@@ -168,8 +202,6 @@ const AdminPanel = ({ onClose }) => {
     </button>
   );
 
-  const currentPrimary = formData.theme.themes[formData.theme.activeTheme].primary;
-
   return (
     <div className="flex h-full bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white font-sans">
       
@@ -182,6 +214,9 @@ const AdminPanel = ({ onClose }) => {
           </button>
         </div>
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          <div className="mb-4 pb-4 border-b border-gray-100 dark:border-slate-700">
+             <TabButton id="inbox" icon={Inbox} label="Inbox (Messages)" />
+          </div>
           <TabButton id="hero" icon={Layout} label="Hero Section" />
           <TabButton id="services" icon={Briefcase} label="Services" />
           <TabButton id="about" icon={Type} label="About Us" />
@@ -198,9 +233,39 @@ const AdminPanel = ({ onClose }) => {
       <div className="flex-1 overflow-y-auto p-8 bg-gray-100 dark:bg-slate-950">
         <div className="max-w-7xl mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-8 min-h-[500px] relative">
           
-          {/* ... DİĞER SEKMELER (Hero, Services vb.) AYNEN KALIYOR ... */}
-          {/* SADECE DEĞİŞEN 'FOOTER' KISMINI VE DİĞERLERİNİ EKLİYORUZ */}
-          
+          {/* --- INBOX --- */}
+          {activeTab === 'inbox' && (
+            <div className="space-y-6">
+              <div className="border-b pb-4 mb-6 border-gray-100 dark:border-slate-700 flex justify-between items-center">
+                <h3 className="text-2xl font-bold flex items-center gap-3"><Inbox className="text-secondary" /> Inbox</h3>
+                <span className="text-sm bg-gray-100 dark:bg-slate-700 px-3 py-1 rounded-full text-gray-500 font-medium">{messages.length} Messages</span>
+              </div>
+              {loadingMessages ? ( <div className="text-center py-20 text-gray-400">Loading messages...</div> ) : messages.length === 0 ? ( <div className="text-center py-20 bg-gray-50 dark:bg-slate-700/30 rounded-xl border border-dashed border-gray-200 dark:border-slate-600"><Mail size={48} className="mx-auto text-gray-300 mb-4" /><p className="text-gray-500">No messages found.</p></div> ) : (
+                <div className="space-y-4">
+                  {messages.map((msg) => (
+                    <div key={msg.id} className="p-5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/20 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm group">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-lg">{msg.name.charAt(0).toUpperCase()}</div>
+                          <div><h4 className="font-bold text-gray-900 dark:text-white">{msg.name}</h4><p className="text-xs text-gray-500">{msg.email}</p></div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className="text-xs text-gray-400 flex items-center gap-1"><Clock size={12} /> {formatDate(msg.createdAt)}</span>
+                          <button onClick={() => handleDeleteMessage(msg.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Delete"><Trash2 size={18} /></button>
+                        </div>
+                      </div>
+                      <div className="pl-13">
+                        <div className="inline-block px-2 py-1 rounded bg-gray-200 dark:bg-slate-600 text-xs font-bold mb-2">{msg.subject}</div>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-100 dark:border-slate-600">{msg.message}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* --- HERO --- */}
           {activeTab === 'hero' && (
             <div className="space-y-6">
               <h3 className="text-2xl font-bold border-b pb-4 mb-6 border-gray-100 dark:border-slate-700">Hero Section</h3>
@@ -214,6 +279,7 @@ const AdminPanel = ({ onClose }) => {
             </div>
           )}
 
+          {/* --- SERVICES --- */}
           {activeTab === 'services' && (
             <div className="space-y-8">
               {editingServiceId === null ? (
@@ -284,18 +350,7 @@ const AdminPanel = ({ onClose }) => {
               </div>
               <div><label className="label">Description</label><textarea rows="6" className="input-field" value={formData.about.description} onChange={(e) => handleChange('about', 'description', e.target.value)} /></div>
               <div><label className="label">About Image URL</label><div className="flex gap-4 items-center"><input type="text" className="input-field" value={formData.about.image} onChange={(e) => handleChange('about', 'image', e.target.value)} />{formData.about.image && <img src={formData.about.image} alt="Preview" className="w-16 h-10 object-cover rounded border" />}</div></div>
-              
-              <div>
-                <label className="label mb-2">Statistics</label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {formData.about.stats.map((stat, index) => (
-                    <div key={index} className="p-4 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-slate-600">
-                      <div className="mb-2"><label className="label text-[10px]">Value</label><input type="text" className="input-field font-bold" value={stat.value} onChange={(e) => handleStatChange(index, 'value', e.target.value)} /></div>
-                      <div><label className="label text-[10px]">Label</label><input type="text" className="input-field" value={stat.label} onChange={(e) => handleStatChange(index, 'label', e.target.value)} /></div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <div><label className="label mb-2">Statistics</label><div className="grid grid-cols-1 md:grid-cols-3 gap-4">{formData.about.stats.map((stat, index) => (<div key={index} className="p-4 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-slate-600"><div className="mb-2"><label className="label text-[10px]">Value</label><input type="text" className="input-field font-bold" value={stat.value} onChange={(e) => handleStatChange(index, 'value', e.target.value)} /></div><div><label className="label text-[10px]">Label</label><input type="text" className="input-field" value={stat.label} onChange={(e) => handleStatChange(index, 'label', e.target.value)} /></div></div>))}</div></div>
               <SaveButton saving={saving} onClick={() => handleSave('about')} />
             </div>
           )}
@@ -345,112 +400,30 @@ const AdminPanel = ({ onClose }) => {
             </div>
           )}
 
-          {/* --- FOOTER (GÜNCELLENDİ: LOGO TEXT ve SINIRSIZ SOSYAL MEDYA) --- */}
+          {/* --- FOOTER --- */}
           {activeTab === 'footer' && (
             <div className="space-y-8">
-              <div className="border-b pb-4 mb-6 border-gray-100 dark:border-slate-700">
-                <h3 className="text-2xl font-bold">Footer Settings</h3>
-              </div>
-
-              {/* Footer Logo Metni */}
-              <div>
-                <label className="label">Footer Brand Text (Logo)</label>
-                <input 
-                  type="text" 
-                  className="input-field" 
-                  value={formData.general.logoText} 
-                  onChange={(e) => handleGeneralChange('logoText', e.target.value)} 
-                  placeholder="BUYAN PARTNERS"
-                />
-                <p className="text-xs text-gray-500 mt-1">This updates both Navbar and Footer branding.</p>
-              </div>
-
-              <div>
-                <label className="label">Footer Description</label>
-                <textarea rows="3" className="input-field" value={formData.footer.description} onChange={(e) => handleChange('footer', 'description', e.target.value)} />
-              </div>
-
-              {/* SOCIAL MEDIA LINKS */}
+              <div className="border-b pb-4 mb-6 border-gray-100 dark:border-slate-700"><h3 className="text-2xl font-bold">Footer Settings</h3></div>
+              <div><label className="label">Footer Brand Text (Logo)</label><input type="text" className="input-field" value={formData.general.logoText} onChange={(e) => handleGeneralChange('logoText', e.target.value)} placeholder="BUYAN PARTNERS" /><p className="text-xs text-gray-500 mt-1">This updates both Navbar and Footer branding.</p></div>
+              <div><label className="label">Footer Description</label><textarea rows="3" className="input-field" value={formData.footer.description} onChange={(e) => handleChange('footer', 'description', e.target.value)} /></div>
               <div className="space-y-4 pt-4">
-                <div className="flex justify-between items-center border-b pb-2 mb-2 border-gray-100 dark:border-slate-700">
-                  <h4 className="font-bold text-lg">Social Media Links</h4>
-                  <button 
-                    onClick={() => handleAddFooterItem('socials', { name: "linkedin", url: "#" })}
-                    className="bg-secondary text-white px-2 py-1 rounded text-xs flex items-center gap-1"
-                  >
-                    <Plus size={14} /> Add New
-                  </button>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {formData.footer.socials.map((social, index) => (
-                    <div key={index} className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
-                      {/* Platform Seçici (Geniş Liste) */}
-                      <select 
-                        value={social.name} 
-                        onChange={(e) => handleFooterArrayChange('socials', index, 'name', e.target.value)}
-                        className="input-field w-36 text-sm bg-white dark:bg-slate-800"
-                      >
-                        {SOCIAL_PLATFORMS.map(platform => (
-                          <option key={platform.value} value={platform.value}>{platform.label}</option>
-                        ))}
-                      </select>
-                      
-                      <input 
-                        type="text" 
-                        className="input-field text-sm" 
-                        value={social.url} 
-                        onChange={(e) => handleFooterArrayChange('socials', index, 'url', e.target.value)} 
-                        placeholder="https://..."
-                      />
-                      <button onClick={() => handleDeleteFooterItem('socials', index)} className="text-red-500 hover:bg-red-100 p-2 rounded"><Trash2 size={16} /></button>
-                    </div>
-                  ))}
-                </div>
+                <div className="flex justify-between items-center border-b pb-2 mb-2 border-gray-100 dark:border-slate-700"><h4 className="font-bold text-lg">Social Media Links</h4><button onClick={() => handleAddFooterItem('socials', { name: "linkedin", url: "#" })} className="bg-secondary text-white px-2 py-1 rounded text-xs flex items-center gap-1"><Plus size={14} /> Add New</button></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{formData.footer.socials.map((social, index) => (<div key={index} className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg"><select value={social.name} onChange={(e) => handleFooterArrayChange('socials', index, 'name', e.target.value)} className="input-field w-36 text-sm bg-white dark:bg-slate-800">{SOCIAL_PLATFORMS.map(platform => (<option key={platform.value} value={platform.value}>{platform.label}</option>))}</select><input type="text" className="input-field text-sm" value={social.url} onChange={(e) => handleFooterArrayChange('socials', index, 'url', e.target.value)} placeholder="https://..." /><button onClick={() => handleDeleteFooterItem('socials', index)} className="text-red-500 hover:bg-red-100 p-2 rounded"><Trash2 size={16} /></button></div>))}</div>
               </div>
-
-              {/* LEGAL LINKS */}
               <div className="space-y-4 pt-4">
-                <div className="flex justify-between items-center border-b pb-2 mb-2 border-gray-100 dark:border-slate-700">
-                  <h4 className="font-bold text-lg">Legal Links</h4>
-                  <button 
-                    onClick={() => handleAddFooterItem('links', { title: "New Link", url: "#" })}
-                    className="bg-secondary text-white px-2 py-1 rounded text-xs flex items-center gap-1"
-                  >
-                    <Plus size={14} /> Add New
-                  </button>
-                </div>
-                
-                {formData.footer.links.map((link, index) => (
-                  <div key={index} className="flex gap-4 items-center">
-                    <input type="text" className="input-field w-1/3" value={link.title} onChange={(e) => handleFooterArrayChange('links', index, 'title', e.target.value)} placeholder="Link Title" />
-                    <input type="text" className="input-field flex-1" value={link.url} onChange={(e) => handleFooterArrayChange('links', index, 'url', e.target.value)} placeholder="URL (# or https://...)" />
-                    <button onClick={() => handleDeleteFooterItem('links', index)} className="text-red-500 hover:bg-red-100 p-2 rounded"><Trash2 size={16} /></button>
-                  </div>
-                ))}
+                <div className="flex justify-between items-center border-b pb-2 mb-2 border-gray-100 dark:border-slate-700"><h4 className="font-bold text-lg">Legal Links</h4><button onClick={() => handleAddFooterItem('links', { title: "New Link", url: "#" })} className="bg-secondary text-white px-2 py-1 rounded text-xs flex items-center gap-1"><Plus size={14} /> Add New</button></div>
+                {formData.footer.links.map((link, index) => (<div key={index} className="flex gap-4 items-center"><input type="text" className="input-field w-1/3" value={link.title} onChange={(e) => handleFooterArrayChange('links', index, 'title', e.target.value)} placeholder="Link Title" /><input type="text" className="input-field flex-1" value={link.url} onChange={(e) => handleFooterArrayChange('links', index, 'url', e.target.value)} placeholder="URL (# or https://...)" /><button onClick={() => handleDeleteFooterItem('links', index)} className="text-red-500 hover:bg-red-100 p-2 rounded"><Trash2 size={16} /></button></div>))}
               </div>
-
               <SaveButton saving={saving} onClick={() => handleSave('footer')} />
             </div>
           )}
 
+          {/* --- THEME --- */}
           {activeTab === 'theme' && (
             <div className="space-y-8">
-              <div className="border-b pb-4 mb-6 border-gray-100 dark:border-slate-700">
-                <h3 className="text-2xl font-bold">Theme Settings</h3>
-                <p className="text-sm text-gray-500 mt-1">Select a professional color preset for your brand identity.</p>
-              </div>
+              <div className="border-b pb-4 mb-6 border-gray-100 dark:border-slate-700"><h3 className="text-2xl font-bold">Theme Settings</h3><p className="text-sm text-gray-500 mt-1">Select a professional color preset for your brand identity.</p></div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {COLOR_PRESETS.map((preset) => {
-                  const isSelected = preset.primary === formData.theme.themes[formData.theme.activeTheme].primary;
-                  return (
-                    <button key={preset.name} onClick={() => handleApplyPreset(preset)} className={`relative p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3 group ${isSelected ? 'border-secondary bg-secondary/5 ring-2 ring-secondary/20' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-500'}`}>
-                      <div className="flex -space-x-3"><div className="w-10 h-10 rounded-full shadow-lg border-2 border-white dark:border-slate-900 z-10" style={{ backgroundColor: preset.primary }}></div><div className="w-10 h-10 rounded-full shadow-lg border-2 border-white dark:border-slate-900 z-0" style={{ backgroundColor: preset.secondary }}></div></div>
-                      <span className={`text-xs font-bold uppercase tracking-wider ${isSelected ? 'text-secondary' : 'text-gray-500'}`}>{preset.name}</span>
-                      {isSelected && (<div className="absolute top-2 right-2 text-secondary bg-white dark:bg-slate-900 rounded-full p-0.5 shadow-sm"><Check size={14} strokeWidth={3} /></div>)}
-                    </button>
-                  );
-                })}
+                {COLOR_PRESETS.map((preset) => { const isSelected = preset.primary === formData.theme.themes[formData.theme.activeTheme].primary; return (<button key={preset.name} onClick={() => handleApplyPreset(preset)} className={`relative p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3 group ${isSelected ? 'border-secondary bg-secondary/5 ring-2 ring-secondary/20' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-500'}`}><div className="flex -space-x-3"><div className="w-10 h-10 rounded-full shadow-lg border-2 border-white dark:border-slate-900 z-10" style={{ backgroundColor: preset.primary }}></div><div className="w-10 h-10 rounded-full shadow-lg border-2 border-white dark:border-slate-900 z-0" style={{ backgroundColor: preset.secondary }}></div></div><span className={`text-xs font-bold uppercase tracking-wider ${isSelected ? 'text-secondary' : 'text-gray-500'}`}>{preset.name}</span>{isSelected && (<div className="absolute top-2 right-2 text-secondary bg-white dark:bg-slate-900 rounded-full p-0.5 shadow-sm"><Check size={14} strokeWidth={3} /></div>)}</button>); })}
               </div>
               <SaveButton saving={saving} onClick={() => handleSave('theme')} />
             </div>
