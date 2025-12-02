@@ -4,7 +4,6 @@ import { AnimatePresence } from "framer-motion";
 import { auth } from "./firebase"; // Firebase Auth
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { Settings, LogOut } from "lucide-react"; // İkonlar
-
 import Navbar from "./components/Navbar"; 
 import Services from "./components/Services";
 import About from "./components/About";

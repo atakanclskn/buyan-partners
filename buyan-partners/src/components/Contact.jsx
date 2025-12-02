@@ -118,7 +118,7 @@ const Contact = () => {
                       value={formData.name} 
                       onChange={handleChange} 
                       className={`w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-700 border text-gray-900 dark:text-white focus:border-secondary outline-none transition-colors ${errors.name ? 'border-red-500' : 'border-gray-200 dark:border-slate-600'}`} 
-                      placeholder="Ex: John Doe" 
+                      placeholder="Ex: Your Name" 
                     />
                     <AnimatePresence>
                       {errors.name && (
@@ -138,7 +138,7 @@ const Contact = () => {
                       value={formData.email} 
                       onChange={handleChange} 
                       className={`w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-700 border text-gray-900 dark:text-white focus:border-secondary outline-none transition-colors ${errors.email ? 'border-red-500' : 'border-gray-200 dark:border-slate-600'}`} 
-                      placeholder="john@company.com" 
+                      placeholder="your@email.com" 
                     />
                     <AnimatePresence>
                       {errors.email && (
