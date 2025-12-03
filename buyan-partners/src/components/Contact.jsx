@@ -12,20 +12,28 @@ const Contact = () => {
   if (!config || !config.contact) return null;
   const { contact } = config;
 
-  // --- DİNAMİK SUBJECT LİSTESİ ---
   const defaultSubjects = ["Project Consulting", "General Inquiry"];
-  const subjectOptions = (contact.subjects && contact.subjects.length > 0) 
-    ? contact.subjects 
-    : defaultSubjects;
+  const subjectOptions = (contact.subjects && contact.subjects.length > 0) ? contact.subjects : defaultSubjects;
 
-  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
   const [errors, setErrors] = useState({});
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [status, setStatus] = useState("idle"); 
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: null });
+    
+    // Hata temizleme
+    if (errors[e.target.name]) {
+       const newErrors = { ...errors };
+       delete newErrors[e.target.name];
+       // Biri girilince diğerinin zorunluluk hatasını da kaldır
+       if (e.target.name === 'email' || e.target.name === 'phone') {
+         if (newErrors.email === "Email or Phone required.") delete newErrors.email;
+         if (newErrors.phone === "Email or Phone required.") delete newErrors.phone;
+       }
+       setErrors(newErrors);
+    }
   };
 
   const handleSelectSubject = (option) => {
@@ -37,10 +45,35 @@ const Contact = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Name is required.";
-    if (!formData.email.trim()) newErrors.email = "Email is required.";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email format.";
+    
+    const hasEmail = formData.email.trim().length > 0;
+    const hasPhone = formData.phone.trim().length > 0;
+
+    // 1. KURAL: İkisinden biri mutlaka olmalı
+    if (!hasEmail && !hasPhone) {
+      newErrors.email = "Email or Phone required.";
+      newErrors.phone = "Email or Phone required.";
+    } else {
+      // 2. KURAL: Email varsa formatı düzgün mü?
+      if (hasEmail && !/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = "Invalid email format.";
+      }
+      // 3. KURAL: Telefon varsa formatı düzgün mü? (Rakam, boşluk, +, -, parantez kabul eder)
+      if (hasPhone) {
+        // En az 7 karakter, sadece geçerli telefon karakterleri
+        const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im; 
+        // Veya daha geniş kapsamlı: /^\+?[0-9\s\-()]{7,20}$/
+        
+        // Basit ve etkili regex (Global uyumlu):
+        if (!/^\+?[0-9\s\-()]{7,20}$/.test(formData.phone.trim())) {
+            newErrors.phone = "Invalid phone format.";
+        }
+      }
+    }
+
     if (!formData.subject) newErrors.subject = "Subject is required.";
     if (!formData.message.trim()) newErrors.message = "Message is required.";
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -52,7 +85,7 @@ const Contact = () => {
     try {
       await addDoc(collection(db, "messages"), { ...formData, createdAt: serverTimestamp(), read: false });
       setStatus("success");
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
       setTimeout(() => setStatus("idle"), 3000);
     } catch (error) {
       setStatus("error");
@@ -60,7 +93,6 @@ const Contact = () => {
     }
   };
 
-  // Status Kontrolü (Available / Busy)
   const isAvailable = !contact.status || contact.status === 'available';
 
   return (
@@ -80,8 +112,6 @@ const Contact = () => {
                   <div className="flex items-start space-x-4"><MapPin className="w-6 h-6 text-secondary mt-1" /><div><p className="text-sm text-white/60 uppercase tracking-wider font-semibold">Office</p><p className="text-lg max-w-xs">{contact.info.address}</p></div></div>
                 </div>
               </div>
-
-              {/* DİNAMİK DURUM GÖSTERGESİ */}
               <div className="mt-12 pt-12 border-t border-white/10">
                 <div className="flex items-center space-x-3 text-white/90">
                   <div className="relative flex items-center justify-center w-3 h-3">
@@ -93,38 +123,53 @@ const Contact = () => {
               </div>
             </div>
 
-            {/* SAĞ TARAF FORM */}
+            {/* SAĞ TARAF (FORM) */}
             <div className="bg-white dark:bg-slate-800 p-12 lg:p-16 lg:col-span-2 transition-colors duration-300">
               <form onSubmit={handleSendMessage} noValidate>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-2">
-                  <div className="relative mb-6">
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                  {/* Name */}
+                  <div className="relative">
                     <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">Name</label>
                     <input type="text" name="name" value={formData.name} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-700 border text-gray-900 dark:text-white focus:border-secondary outline-none transition-colors ${errors.name ? 'border-red-500' : 'border-gray-200 dark:border-slate-600'}`} placeholder="Ex: John Doe" />
                     <AnimatePresence>{errors.name && (<motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute -bottom-5 left-0 text-red-500 text-xs font-medium flex items-center gap-1"><AlertCircle size={12} /> {errors.name}</motion.p>)}</AnimatePresence>
                   </div>
-                  <div className="relative mb-6">
+
+                  {/* Subject */}
+                  <div className="relative z-20">
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">Subject</label>
+                    <div onClick={() => setIsDropdownOpen(!isDropdownOpen)} className={`w-full px-4 py-3 rounded-lg border cursor-pointer flex justify-between items-center transition-colors ${errors.subject ? 'border-red-500' : 'bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-slate-600'}`}>
+                        <span className={formData.subject ? 'text-gray-900 dark:text-white' : 'text-gray-400'}>{formData.subject || "Select..."}</span>
+                        <ChevronDown size={20} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                    <AnimatePresence>{errors.subject && !isDropdownOpen && (<motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute -bottom-5 left-0 text-red-500 text-xs font-medium flex items-center gap-1"><AlertCircle size={12} /> {errors.subject}</motion.p>)}</AnimatePresence>
+                    {isDropdownOpen && (
+                        <div className="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-600 rounded-xl shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
+                        {subjectOptions.map((option, idx) => (
+                            <div key={idx} onClick={() => handleSelectSubject(option)} className="px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300">{option}</div>
+                        ))}
+                        </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                  {/* Email */}
+                  <div className="relative">
                     <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">Email Address</label>
                     <input type="email" name="email" value={formData.email} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-700 border text-gray-900 dark:text-white focus:border-secondary outline-none transition-colors ${errors.email ? 'border-red-500' : 'border-gray-200 dark:border-slate-600'}`} placeholder="john@company.com" />
                     <AnimatePresence>{errors.email && (<motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute -bottom-5 left-0 text-red-500 text-xs font-medium flex items-center gap-1"><AlertCircle size={12} /> {errors.email}</motion.p>)}</AnimatePresence>
                   </div>
-                </div>
 
-                <div className="relative mb-8 z-20">
-                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">Subject</label>
-                  <div onClick={() => setIsDropdownOpen(!isDropdownOpen)} className={`w-full px-4 py-3 rounded-lg border cursor-pointer flex justify-between items-center transition-colors ${errors.subject ? 'border-red-500' : 'bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-slate-600'}`}>
-                    <span className={formData.subject ? 'text-gray-900 dark:text-white' : 'text-gray-400'}>{formData.subject || "Select a subject..."}</span>
-                    <ChevronDown size={20} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  {/* Phone (YAZI KALDIRILDI) */}
+                  <div className="relative">
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">Phone Number</label>
+                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-700 border text-gray-900 dark:text-white focus:border-secondary outline-none transition-colors ${errors.phone ? 'border-red-500' : 'border-gray-200 dark:border-slate-600'}`} placeholder="+1 (555) 000-0000" />
+                    <AnimatePresence>{errors.phone && (<motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute -bottom-5 left-0 text-red-500 text-xs font-medium flex items-center gap-1"><AlertCircle size={12} /> {errors.phone}</motion.p>)}</AnimatePresence>
                   </div>
-                  <AnimatePresence>{errors.subject && !isDropdownOpen && (<motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute -bottom-5 left-0 text-red-500 text-xs font-medium flex items-center gap-1"><AlertCircle size={12} /> {errors.subject}</motion.p>)}</AnimatePresence>
-                  {isDropdownOpen && (
-                    <div className="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-600 rounded-xl shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
-                      {subjectOptions.map((option, idx) => (
-                        <div key={idx} onClick={() => handleSelectSubject(option)} className="px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300">{option}</div>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
+                {/* Message */}
                 <div className="relative mb-8 z-10">
                   <div className="flex justify-between mb-2">
                     <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 block">Message</label>
