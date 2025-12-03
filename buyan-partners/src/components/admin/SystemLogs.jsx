@@ -5,8 +5,8 @@ import { Activity, Shield, Edit, Trash2, LogIn, AlertCircle, Clock, User, Filter
 
 const SystemLogs = () => {
   const [logs, setLogs] = useState([]); 
-  const [loading, setLoading] = useState(false); 
-  const [errorMsg, setErrorMsg] = useState(null); // Hata mesajı için state
+  const [loading, setLoading] = useState(false);
+  const [systemError, setSystemError] = useState(null); // İndeks hatasını göstermek için
   
   // Filtreler
   const [limitCount, setLimitCount] = useState(50);
@@ -17,18 +17,15 @@ const SystemLogs = () => {
 
   // --- ANA ETKİ (EFFECT) ---
   useEffect(() => {
-    setLogs([]); // Temizle
+    // 1. HER ŞEYİ TEMİZLE (Eski veriler ekranda kalmasın)
+    setLogs([]); 
+    setSystemError(null);
     setLoading(true);
-    setErrorMsg(null); // Hatayı sıfırla
+
+    let unsubscribe = () => {};
 
     try {
       const logsRef = collection(db, "system_logs");
-      
-      // SORGULAMA STRATEJİSİ:
-      // Eğer filtre varsa 'createdAt' ile sıralamayı geçici olarak kaldırıp (client-side sort) deneyebiliriz 
-      // ama en doğrusu Firebase Index oluşturmaktır.
-      // Şimdilik standart sorguyu yapıyoruz.
-      
       let constraints = [];
 
       // 1. Tip Filtresi
@@ -48,9 +45,7 @@ const SystemLogs = () => {
         constraints.push(where("createdAt", "<=", end));
       }
 
-      // 3. Sıralama (En Önemli Kısım)
-      // Firebase kuralı: where() ile filtrelediğin alana göre sort yapmalısın veya index oluşturmalısın.
-      // Index yoksa bu sorgu patlar.
+      // 3. Sıralama
       constraints.push(orderBy("createdAt", "desc"));
 
       // 4. Limit
@@ -58,10 +53,11 @@ const SystemLogs = () => {
 
       const q = query(logsRef, ...constraints);
 
-      const unsubscribe = onSnapshot(q, (snapshot) => {
+      // Dinleme Başlat
+      unsubscribe = onSnapshot(q, (snapshot) => {
         let fetchedLogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        // Client-side Arama
+        // Client-Side Arama (User için)
         if (searchUser.trim() !== '') {
           const term = searchUser.toLowerCase();
           fetchedLogs = fetchedLogs.filter(log => 
@@ -72,28 +68,33 @@ const SystemLogs = () => {
 
         setLogs(fetchedLogs);
         setLoading(false);
-      }, (err) => {
-        console.error("Firebase Query Error:", err);
-        // Hatayı Ekrana Bas (Kullanıcı görsün)
-        if (err.message.includes("requires an index")) {
-            setErrorMsg("Missing Index! Open Console (F12) and click the link from Firebase.");
+      }, (error) => {
+        // HATA YAKALAMA
+        console.error("Firebase Hatası:", error);
+        if (error.message.includes("requires an index")) {
+          setSystemError("⚠️ BU SORGUNUN ÇALIŞMASI İÇİN 'INDEX' GEREKLİ. Lütfen F12 Konsol'daki linke tıklayıp oluşturun.");
         } else {
-            setErrorMsg(err.message);
+          setSystemError(error.message);
         }
+        setLogs([]); // Hata varsa listeyi boşalt
         setLoading(false);
       });
 
-      return () => unsubscribe();
-
-    } catch (err) {
-      console.error("Logic Error:", err);
-      setErrorMsg(err.message);
+    } catch (error) {
+      console.error("Kod Hatası:", error);
+      setSystemError(error.message);
+      setLogs([]);
       setLoading(false);
     }
+
+    return () => unsubscribe();
+
   }, [limitCount, filterType, startDate, endDate, searchUser]); 
 
+  // Format Helper
   const formatDate = (timestamp) => {
     if (!timestamp) return "-";
+    // Timestamp kontrolü
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
     return date.toLocaleString('tr-TR', {
       day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
@@ -121,7 +122,7 @@ const SystemLogs = () => {
   return (
     <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-sm border border-gray-200 dark:border-slate-700 transition-colors duration-300">
       
-      {/* HEADER & FILTERS */}
+      {/* HEADER */}
       <div className="border-b border-gray-200 dark:border-slate-700 bg-gray-50/80 dark:bg-slate-800/80 p-5 space-y-4">
         <div className="flex justify-between items-center">
           <div>
@@ -135,6 +136,7 @@ const SystemLogs = () => {
           </button>
         </div>
 
+        {/* FİLTRELER */}
         <div className="flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-[150px]">
             <label className="text-[10px] font-bold uppercase text-gray-400 mb-1 block">Type</label>
@@ -149,35 +151,58 @@ const SystemLogs = () => {
               </select>
             </div>
           </div>
-          {/* Diğer filtreler aynı... */}
+          {/* Diğer inputlar... */}
+          <div className="flex-1 min-w-[200px] flex gap-2">
+            <div className="w-1/2">
+                <label className="text-[10px] font-bold uppercase text-gray-400 mb-1 block">Start</label>
+                <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full px-2 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-sm outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200"/>
+            </div>
+            <div className="w-1/2">
+                <label className="text-[10px] font-bold uppercase text-gray-400 mb-1 block">End</label>
+                <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-sm outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200"/>
+            </div>
+          </div>
+          <div className="flex-1 min-w-[200px]">
+            <label className="text-[10px] font-bold uppercase text-gray-400 mb-1 block">User</label>
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
+              <input type="text" value={searchUser} onChange={(e) => setSearchUser(e.target.value)} placeholder="Search..." className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-sm outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200"/>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* --- CONTENT --- */}
+      {/* --- İÇERİK --- */}
       <div className="flex-1 overflow-y-auto">
         {loading ? (
           <div className="flex flex-col items-center justify-center h-40 text-gray-400">
             <RefreshCcw className="animate-spin mb-2" />
             <span className="text-sm">Fetching logs...</span>
           </div>
-        ) : errorMsg ? (
-          // HATA MESAJI VARSA GÖSTER
-          <div className="flex flex-col items-center justify-center h-full text-red-500 gap-2 p-4 text-center">
-            <AlertCircle size={40} />
-            <p className="font-bold">System Error</p>
-            <p className="text-sm text-gray-500">{errorMsg}</p>
+        ) : systemError ? (
+          // HATA MESAJI (INDEX UYARISI)
+          <div className="flex flex-col items-center justify-center h-full text-red-500 gap-4 p-8 text-center">
+            <AlertCircle size={48} className="opacity-50" />
+            <div>
+              <p className="font-bold text-lg mb-2">Configuration Required</p>
+              <p className="text-sm bg-red-100 dark:bg-red-900/30 p-3 rounded border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300">
+                {systemError}
+              </p>
+            </div>
           </div>
         ) : logs.length === 0 ? (
+          // BOŞ LİSTE
           <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
             <Shield size={40} className="opacity-20" />
             <p>No records found matching filters.</p>
           </div>
         ) : (
+          // TABLO
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-10 text-gray-500 dark:text-gray-400">
               <tr>
                 <th className="px-6 py-3 font-medium">Type</th>
-                <th className="px-6 py-3 font-medium">Details</th>
+                <th className="px-6 py-3 font-medium">Action & Details</th>
                 <th className="px-6 py-3 font-medium">User</th>
                 <th className="px-6 py-3 font-medium">Time</th>
               </tr>
