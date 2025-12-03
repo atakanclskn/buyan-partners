@@ -2,7 +2,10 @@ import { Save, Plus, Trash2, Check } from 'lucide-react';
 
 const SaveButton = ({ saving, onClick }) => (
   <div className="pt-6 border-t border-gray-100 dark:border-slate-700 flex justify-end sticky bottom-0 bg-white dark:bg-slate-800 z-10 p-4 -mx-8 -mb-8 rounded-b-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
-    <button onClick={onClick} disabled={saving} className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed"><Save size={20} />{saving ? "Saving..." : "Save Changes"}</button>
+    <button onClick={onClick} disabled={saving} className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
+      <Save size={20} />
+      {saving ? "Saving..." : "Save Changes"}
+    </button>
   </div>
 );
 
@@ -112,15 +115,39 @@ const SOCIAL_PLATFORMS = [
 export const FooterEditor = ({ data, generalData, onChange, onGeneralChange, onArrayChange, onAddItem, onDeleteItem, onSave, saving }) => (
   <div className="space-y-8">
     <div className="border-b pb-4 mb-6 border-gray-100 dark:border-slate-700"><h3 className="text-2xl font-bold">Footer Settings</h3></div>
+    
     <div><label className="admin-label">Footer Brand Text (Logo)</label><input type="text" className="admin-input" value={generalData.logoText} onChange={(e) => onGeneralChange('logoText', e.target.value)} placeholder="BUYAN PARTNERS" /></div>
+    
     <div><label className="admin-label">Footer Description</label><textarea rows="3" className="admin-input" value={data.description} onChange={(e) => onChange('description', e.target.value)} /></div>
+    
     <div className="space-y-4 pt-4">
       <div className="flex justify-between items-center border-b pb-2 mb-2 border-gray-100 dark:border-slate-700"><h4 className="font-bold text-lg">Social Media Links</h4><button onClick={() => onAddItem('socials', { name: "linkedin", url: "#" })} className="admin-btn-add"><Plus size={14} /> Add New</button></div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{data.socials.map((social, index) => (<div key={index} className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg"><select value={social.name} onChange={(e) => onArrayChange('socials', index, 'name', e.target.value)} className="admin-input w-36 text-sm bg-white dark:bg-slate-800">{SOCIAL_PLATFORMS.map(platform => (<option key={platform.value} value={platform.value}>{platform.label}</option>))}</select><input type="text" className="admin-input text-sm" value={social.url} onChange={(e) => onArrayChange('socials', index, 'url', e.target.value)} placeholder="https://..." /><button onClick={() => onDeleteItem('socials', index)} className="text-red-500 hover:bg-red-100 p-2 rounded"><Trash2 size={16} /></button></div>))}</div>
     </div>
+
+    {/* DÜZELTİLEN KISIM: LEGAL LINKS */}
+    {/* Artık hem isim hem de link girmek için 2 kutu var */}
     <div className="space-y-4 pt-4">
       <div className="flex justify-between items-center border-b pb-2 mb-2 border-gray-100 dark:border-slate-700"><h4 className="font-bold text-lg">Legal Links</h4><button onClick={() => onAddItem('links', { title: "New Link", url: "#" })} className="admin-btn-add"><Plus size={14} /> Add New</button></div>
-      {data.links.map((link, index) => (<div key={index} className="flex gap-4 items-center"><input type="text" className="admin-input w-1/3" value={link.title} onChange={(e) => onArrayChange('links', index, 'title', e.target.value)} placeholder="Link Title" /><input type="text" className="admin-input flex-1" value={link.url} onChange={(e) => onArrayChange('links', index, 'url', e.target.value)} placeholder="URL (# or https://...)" /><button onClick={() => onDeleteItem('links', index)} className="text-red-500 hover:bg-red-100 p-2 rounded"><Trash2 size={16} /></button></div>))}
+      {data.links.map((link, index) => (
+        <div key={index} className="flex gap-4 items-center mb-2">
+          <input 
+            type="text" 
+            className="admin-input w-1/3" 
+            value={link.title} 
+            onChange={(e) => onArrayChange('links', index, 'title', e.target.value)} 
+            placeholder="Label (Ex: Privacy Policy)" 
+          />
+          <input 
+            type="text" 
+            className="admin-input flex-1" 
+            value={link.url} 
+            onChange={(e) => onArrayChange('links', index, 'url', e.target.value)} 
+            placeholder="Link URL (Ex: /privacy or https://...)" 
+          />
+          <button onClick={() => onDeleteItem('links', index)} className="text-red-500 hover:bg-red-100 p-2 rounded"><Trash2 size={16} /></button>
+        </div>
+      ))}
     </div>
     <SaveButton saving={saving} onClick={onSave} />
   </div>
