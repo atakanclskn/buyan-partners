@@ -1,9 +1,9 @@
 export const siteConfig = {
   // GENERAL SETTINGS
   general: {
-    siteName: "Buyan Partners",
+    siteName: "BUYAN PARTNERS",
     logoText: "BUYAN PARTNERS", 
-    footerText: "© 2025 Buyan Partners. All rights reserved.",
+    footerText: "© 2026 BBUYAN PARTNERS. All rights reserved.",
   },
 
   // THEME SETTINGS

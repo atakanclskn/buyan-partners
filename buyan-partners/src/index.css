@@ -91,3 +91,6 @@ html {
 .admin-btn-add:hover {
   background-color: #2563eb;
 }
+.font-brand {
+  font-family: 'Cinzel', serif !important;
+}

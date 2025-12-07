@@ -17,14 +17,15 @@ const Preloader = () => {
     >
       <div className="relative">
         <h1 
-          className="text-4xl md:text-6xl font-bold tracking-widest uppercase"
+          // TEK DEĞİŞİKLİK BURADA: "font-brand" eklendi.
+          className="text-4xl md:text-6xl font-brand font-bold tracking-widest uppercase"
           style={{
             color: 'transparent',
             backgroundImage: darkMode ? darkGradient : lightGradient,
             backgroundSize: '200% 100%',
             WebkitBackgroundClip: 'text',
             backgroundClip: 'text',
-            // HIZLANDIRILDI: 3s yerine 1.5s
+            // HIZLANDIRILDI: 3s yerine 1.5s (Senin ayarın korundu)
             animation: 'shine 1.5s linear infinite' 
           }}
         >

@@ -141,17 +141,18 @@ const Navbar = () => {
           className="flex justify-between items-center shadow-lg box-border w-full pointer-events-auto z-50 relative overflow-hidden"
         >
           {/* LOGO */}
-          <div className="text-2xl font-bold cursor-pointer shrink-0 whitespace-nowrap z-10">
-            <a
-              href="/"
-              onClick={handleScrollToTop}
-              className={`${
-                isScrolled || isMobileMenuOpen ? "text-gray-900 dark:text-white" : "text-white"
-              } transition-colors duration-300`}
-            >
-              {general.logoText}
-            </a>
-          </div>
+          <div className="text-2xl font-brand font-bold cursor-pointer shrink-0 whitespace-nowrap z-10 tracking-wider">
+  <a
+    href="/"
+    onClick={handleScrollToTop}
+    className={`${
+      isScrolled || isMobileMenuOpen ? "text-gray-900 dark:text-white" : "text-white"
+    } transition-colors duration-300`}
+  >
+    {/* Eğer config dosyasında logoText 'BUYAN PARTNERS' ise direkt onu yazar */}
+    {general.logoText}
+  </a>
+</div>
 
           {/* --- MASAÜSTÜ MENÜ (KAYAN HAP EFEKTİ) --- */}
           <div className="hidden md:flex items-center space-x-2 font-medium whitespace-nowrap z-10" 
