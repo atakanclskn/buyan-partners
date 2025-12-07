@@ -59,7 +59,7 @@ const Login = ({ onClose, onLoginSuccess }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:border-secondary outline-none transition-colors"
-                placeholder="admin@buyanpartners.com"
+                placeholder=""
               />
             </div>
           </div>
@@ -74,7 +74,7 @@ const Login = ({ onClose, onLoginSuccess }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:border-secondary outline-none transition-colors"
-                placeholder="••••••••"
+                placeholder=""
               />
             </div>
           </div>
