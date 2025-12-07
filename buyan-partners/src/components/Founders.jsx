@@ -12,38 +12,35 @@ const Founders = () => {
   if (!founders) return null;
 
   return (
-    <section id="founders" className="py-24 bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
+    <section id="founders" className="py-12 md:py-24 bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
       
-      <div className="container mx-auto px-6 max-w-6xl">
+      <div className="container mx-auto px-4 md:px-6 max-w-6xl">
         
         {/* Başlık */}
         {founders.title && (
            <Reveal>
-             <div className="text-center mb-16">
-               <h2 className="text-4xl font-bold text-gray-900 dark:text-white">{founders.title}</h2>
+             <div className="text-center mb-8 md:mb-16">
+               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">{founders.title}</h2>
              </div>
            </Reveal>
         )}
 
-        {/* --- DÜZEN (LAYOUT) --- 
-            flex: Yan yana diz.
-            flex-wrap: Ekrana sığmazsa (mobil) alta geç.
-            justify-center: ORTALA (2 kişi tam ortada durur).
-            gap-10: Aralarına boşluk koy.
+        {/* --- DÜZEN (LAYOUT) DEĞİŞİKLİĞİ --- 
+            Mobilde (default): grid grid-cols-2 (Yan yana 2 kutu)
+            Masaüstünde (md): flex (Eski düzen)
         */}
-        <div className="flex flex-wrap justify-center gap-10">
+        <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap md:justify-center md:gap-10">
           {founders.items.map((founder, index) => (
             
             <Reveal 
               key={founder.id} 
               delay={index * 0.1} 
-              // --- KART BOYUTU ---
-              // Mobilde: %100 genişlik (w-full)
-              // Bilgisayarda: Sabit 380px (md:w-[380px]) -> İdeal portre boyutu
+              // Mobilde w-full (grid hücresini doldurur), Masaüstünde sabit 380px
               className="w-full md:w-[380px]"
             >
               
-              <div className="group relative overflow-hidden rounded-3xl shadow-2xl bg-white dark:bg-slate-800 transition-all duration-300 hover:-translate-y-2 hover:shadow-3xl h-[500px]">
+              {/* KART YÜKSEKLİĞİ: Mobilde 350px, Masaüstünde 500px */}
+              <div className="group relative overflow-hidden rounded-2xl md:rounded-3xl shadow-lg md:shadow-2xl bg-white dark:bg-slate-800 transition-all duration-300 hover:-translate-y-2 hover:shadow-3xl h-[350px] md:h-[500px]">
                 
                 {/* Görsel Alanı */}
                 <div className="w-full h-full relative">
@@ -58,11 +55,16 @@ const Founders = () => {
                 </div>
 
                 {/* Bilgi Alanı */}
-                <div className="absolute bottom-0 left-0 right-0 p-8 z-20 text-white translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                  <h3 className="text-3xl font-bold mb-2">{founder.name}</h3>
-                  <p className="text-secondary font-bold mb-4 uppercase tracking-wider text-sm">{founder.title}</p>
+                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 z-20 text-white translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
                   
-                  <p className="text-gray-200 text-sm leading-relaxed mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75 line-clamp-4">
+                  {/* İsim Font Boyutu: Mobilde text-lg veya xl, Masaüstünde text-3xl */}
+                  <h3 className="text-lg md:text-3xl font-bold mb-1 md:mb-2 leading-tight">{founder.name}</h3>
+                  
+                  {/* Title Font Boyutu */}
+                  <p className="text-secondary font-bold mb-2 md:mb-4 uppercase tracking-wider text-[10px] md:text-sm">{founder.title}</p>
+                  
+                  {/* Açıklama Yazısı (Mobilde gizlenebilir veya kısaltılabilir, burada line-clamp ile sınırladık) */}
+                  <p className="hidden md:block text-gray-200 text-sm leading-relaxed mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75 line-clamp-4">
                     {founder.bio}
                   </p>
                   
@@ -71,10 +73,10 @@ const Founders = () => {
                       href={founder.linkedin} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-white hover:text-secondary transition-colors text-sm font-semibold border-b border-transparent hover:border-secondary pb-1"
+                      className="inline-flex items-center gap-2 text-white hover:text-secondary transition-colors text-xs md:text-sm font-semibold border-b border-transparent hover:border-secondary pb-1"
                     >
-                      <Linkedin size={18} />
-                      <span>LinkedIn Profile</span>
+                      <Linkedin size={16} className="md:w-[18px] md:h-[18px]" />
+                      <span className="md:inline">LinkedIn</span>
                     </a>
                   )}
                 </div>
