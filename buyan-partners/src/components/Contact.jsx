@@ -131,7 +131,7 @@ const Contact = () => {
                   {/* Name */}
                   <div className="relative">
                     <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">Name</label>
-                    <input type="text" name="name" value={formData.name} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-700 border text-gray-900 dark:text-white focus:border-secondary outline-none transition-colors ${errors.name ? 'border-red-500' : 'border-gray-200 dark:border-slate-600'}`} placeholder="Ex: John Doe" />
+                    <input type="text" name="name" value={formData.name} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-700 border text-gray-900 dark:text-white focus:border-secondary outline-none transition-colors ${errors.name ? 'border-red-500' : 'border-gray-200 dark:border-slate-600'}`} placeholder="Ex: Micheal Jackson" />
                     <AnimatePresence>{errors.name && (<motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute -bottom-5 left-0 text-red-500 text-xs font-medium flex items-center gap-1"><AlertCircle size={12} /> {errors.name}</motion.p>)}</AnimatePresence>
                   </div>
 
@@ -157,7 +157,7 @@ const Contact = () => {
                   {/* Email */}
                   <div className="relative">
                     <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">Email Address</label>
-                    <input type="email" name="email" value={formData.email} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-700 border text-gray-900 dark:text-white focus:border-secondary outline-none transition-colors ${errors.email ? 'border-red-500' : 'border-gray-200 dark:border-slate-600'}`} placeholder="john@company.com" />
+                    <input type="email" name="email" value={formData.email} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-700 border text-gray-900 dark:text-white focus:border-secondary outline-none transition-colors ${errors.email ? 'border-red-500' : 'border-gray-200 dark:border-slate-600'}`} placeholder="marley@company.com" />
                     <AnimatePresence>{errors.email && (<motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="absolute -bottom-5 left-0 text-red-500 text-xs font-medium flex items-center gap-1"><AlertCircle size={12} /> {errors.email}</motion.p>)}</AnimatePresence>
                   </div>
 
