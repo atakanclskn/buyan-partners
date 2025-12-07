@@ -2,11 +2,11 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
-import { SiteProvider } from './context/SiteContext' // Bunu ekledik
+import { SiteProvider } from './context/SiteContext' 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <SiteProvider> {/* Uygulamayı sarmaladık */}
+    <SiteProvider> 
       <App />
     </SiteProvider>
   </React.StrictMode>,
