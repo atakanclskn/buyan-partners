@@ -67,8 +67,8 @@ const Founders = () => {
 
   // --- ANİMASYON VARYANTLARI ---
   const nameTitleVariants = {
-    initial: { y: 0 }, // Başlangıçta en dipte (0 kaydırma)
-    hover: { y: -60, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }, // Hoverda yukarı kay
+    initial: { y: 0 },
+    hover: { y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }, // Hover da hareketi yok, sabit kal
   };
 
   const buttonGroupVariants = {
@@ -130,7 +130,6 @@ const Founders = () => {
               <div className="flex flex-col gap-3">
                 {/* Kart - Sadece resim ve isim */}
                 <motion.div
-                  whileHover="hover"
                   initial="initial"
                   onClick={() => {
                     setDirection(0);
@@ -155,17 +154,14 @@ const Founders = () => {
 
                   {/* İsim ve Title - Resmin üzerinde */}
                   <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 z-20 text-white">
-                    <motion.div
-                      variants={nameTitleVariants}
-                      className="relative z-20"
-                    >
+                    <div className="relative z-20">
                       <h3 className="text-lg md:text-3xl font-bold mb-1 leading-tight">
                         {founder.name}
                       </h3>
                       <p className="text-secondary font-bold uppercase tracking-wider text-[10px] md:text-xs">
                         {founder.title}
                       </p>
-                    </motion.div>
+                    </div>
                   </div>
                 </motion.div>
 
