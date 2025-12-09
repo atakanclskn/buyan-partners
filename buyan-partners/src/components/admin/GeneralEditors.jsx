@@ -247,6 +247,8 @@ export const FooterEditor = ({ data, generalData, onChange, onGeneralChange, onA
         </div>
       ))}
     </div>
+        <div><label className="admin-label">Footer Copyright Text</label><input type="text" className="admin-input" value={generalData.footerText} onChange={(e) => onGeneralChange('footerText', e.target.value)} placeholder="© 2025 Buyan Partners. All rights reserved." /></div>
+
     <SaveButton saving={saving} onClick={onSave} />
   </div>
 );
