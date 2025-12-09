@@ -15,6 +15,8 @@ import Preloader from "./components/Preloader";
 import Login from "./components/Login";         // <-- Login Bileşeni
 import AdminPanel from "./components/AdminPanel"; // <-- Admin Paneli
 
+// @atakanclskn - Main Application Component
+
 function App() {
   const { config } = useSite();
   const [isLoading, setIsLoading] = useState(true);

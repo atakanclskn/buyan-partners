@@ -3,6 +3,7 @@ import { siteConfig as defaultData } from '../data/siteConfig'; // Yerel veri
 import { db } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 
+// @atakanclskn - Global Site Context for Configuration
 const SiteContext = createContext();
 
 export const SiteProvider = ({ children }) => {

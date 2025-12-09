@@ -3,6 +3,7 @@ import { useSite } from "../context/SiteContext";
 import { Menu, X, Moon, Sun, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 
+// @atakanclskn - Navigation Bar Component
 const Navbar = () => {
   const { config, darkMode, setDarkMode } = useSite();
   const { navigation, general } = config;

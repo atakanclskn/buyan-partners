@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// @atakanclskn - Leadership/Founders Component with Modal
 const Founders = () => {
   const { config } = useSite();
   const { founders } = config;

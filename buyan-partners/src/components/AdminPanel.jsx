@@ -10,6 +10,8 @@ import { HeroEditor, AboutEditor, FoundersEditor, ContactEditor, ThemeEditor, Fo
 import IconPicker from './IconPicker';
 import SystemLogs from './admin/SystemLogs';
 
+// @atakanclskn - Admin Dashboard Panel
+
 const AdminPanel = ({ onClose }) => {
   const { config } = useSite();
   const [activeTab, setActiveTab] = useState('inbox');

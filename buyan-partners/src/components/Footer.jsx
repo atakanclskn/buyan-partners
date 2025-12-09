@@ -4,6 +4,7 @@ import {
   Globe, ArrowUp, Send, MessageCircle, Dribbble 
 } from 'lucide-react';
 
+// @atakanclskn - Footer Component
 const Footer = () => {
   const { config } = useSite();
   const { footer, general } = config;
@@ -111,6 +112,18 @@ const Footer = () => {
           </button>
         </div>
 
+        {/* Developer Signature - Çok küçük ve altta */}
+        <div className="text-center mt-8 pt-6 border-t border-white/5">
+          <a 
+            href="https://github.com/atakanclskn" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-700 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-500 transition-colors text-[9px] tracking-widest uppercase"
+            title="Developed by atakanclskn"
+          >
+            Developed by atakanclskn
+          </a>
+        </div>
       </div>
     </footer>
   );
