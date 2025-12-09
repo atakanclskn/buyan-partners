@@ -80,10 +80,10 @@ function App() {
           <Contact />  
           <Footer /> 
 
-          {/* --- ADMIN KONTROLLERİ --- */}
+          {/* --- ADMIN KONTROLLERİ (Sadece Desktop) --- */}
           
-          {/* 1. Admin Butonu (Sağ Alt Köşe) */}
-          <div className="fixed bottom-6 right-6 z-50 flex gap-3">
+          {/* 1. Admin Butonu (Sağ Alt Köşe - Sadece md ve üstü) */}
+          <div className="hidden md:flex fixed bottom-6 right-6 z-50 gap-3">
             {user ? (
               // Eğer giriş yapıldıysa: Paneli Aç ve Çıkış Yap butonları
               <>

@@ -126,73 +126,73 @@ const Founders = () => {
               delay={index * 0.05}
               className="w-full md:w-[280px]"
             >
-              <motion.div
-                whileHover="hover"
-                initial="initial"
-                onClick={() => {
-                  setDirection(0);
-                  setSelectedId(founder.id);
-                }}
-                className="group relative overflow-hidden rounded-2xl md:rounded-3xl shadow-lg bg-white dark:bg-slate-800 cursor-pointer aspect-[3/4] md:aspect-auto md:h-[380px] w-full h-full hover:shadow-2xl transition-all duration-300"
-              >
-                {/* Görsel */}
-                <div className="w-full h-full relative">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10 opacity-60 group-hover:opacity-80 transition-opacity duration-500"></div>
+              <div className="flex flex-col gap-3">
+                {/* Kart - Sadece resim ve isim */}
+                <motion.div
+                  whileHover="hover"
+                  initial="initial"
+                  onClick={() => {
+                    setDirection(0);
+                    setSelectedId(founder.id);
+                  }}
+                  className="group relative overflow-hidden rounded-2xl md:rounded-3xl shadow-lg bg-white dark:bg-slate-800 cursor-pointer aspect-[3/4] md:aspect-auto md:h-[380px] w-full hover:shadow-2xl transition-all duration-300"
+                >
+                  {/* Görsel */}
+                  <div className="w-full h-full relative">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10 opacity-60 group-hover:opacity-80 transition-opacity duration-500"></div>
 
-                  <img
-                    src={
-                      founder.image && founder.image.trim() !== ""
-                        ? founder.image
-                        : DEFAULT_IMAGE
-                    }
-                    alt={founder.name}
-                    className="w-full h-full object-cover object-center filter grayscale group-hover:grayscale-0 transition-all duration-700 block"
-                  />
-                </div>
+                    <img
+                      src={
+                        founder.image && founder.image.trim() !== ""
+                          ? founder.image
+                          : DEFAULT_IMAGE
+                      }
+                      alt={founder.name}
+                      className="w-full h-full object-cover object-center filter grayscale group-hover:grayscale-0 transition-all duration-700 block"
+                    />
+                  </div>
 
-                {/* Bilgi Alanı - Absolute Bottom ile en alta sabitlendi */}
-                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 z-20 text-white">
-                  {/* İsim ve Title Grubu */}
-                  <motion.div
-                    variants={nameTitleVariants}
-                    className="relative z-20"
+                  {/* İsim ve Title - Resmin üzerinde */}
+                  <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 z-20 text-white">
+                    <motion.div
+                      variants={nameTitleVariants}
+                      className="relative z-20"
+                    >
+                      <h3 className="text-lg md:text-3xl font-bold mb-1 leading-tight">
+                        {founder.name}
+                      </h3>
+                      <p className="text-secondary font-bold uppercase tracking-wider text-[10px] md:text-xs">
+                        {founder.title}
+                      </p>
+                    </motion.div>
+                  </div>
+                </motion.div>
+
+                {/* Butonlar - Kartın dışında, altında */}
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => {
+                      setDirection(0);
+                      setSelectedId(founder.id);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 dark:bg-white/10 dark:border-white/20 hover:bg-white hover:text-black dark:hover:bg-white dark:hover:text-black text-white py-2.5 px-4 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300"
                   >
-                    <h3 className="text-lg md:text-3xl font-bold mb-1 leading-tight">
-                      {founder.name}
-                    </h3>
-                    <p className="text-secondary font-bold uppercase tracking-wider text-[10px] md:text-xs">
-                      {founder.title}
-                    </p>
-                  </motion.div>
-
-                  {/* Buton Grubu - Absolute olarak alt kısma yerleştirildi */}
-                  <motion.div
-                    variants={buttonGroupVariants}
-                    className="absolute bottom-5 left-5 right-5 md:bottom-8 md:left-8 md:right-8 flex items-center gap-2 z-10"
-                  >
-                    {/* Learn More Button - Mobilde daha kompakt */}
-                    <button className="flex-1 flex items-center justify-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white hover:text-black text-white py-2 px-3 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300">
-                      <span className="hidden md:inline">Learn More</span>
-                      <ArrowRight size={14} className="md:hidden" />
-                      <ArrowRight size={14} className="hidden md:inline" />
-                    </button>
-
-                    {/* LinkedIn Button - Her zaman görünür */}
-                    {founder.linkedin && founder.linkedin.trim() !== "" && (
-                      <a
-                        href={founder.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-white/20 backdrop-blur-md border border-white/30 hover:bg-[#0077b5] hover:border-[#0077b5] hover:text-white text-white rounded-lg transition-all duration-300"
-                      >
-                        <Linkedin size={16} className="md:hidden" />
-                        <Linkedin size={18} className="hidden md:inline" />
-                      </a>
-                    )}
-                  </motion.div>
+                    <span>Learn More</span>
+                    <ArrowRight size={14} />
+                  </button>
+                  {founder.linkedin && founder.linkedin.trim() !== "" && (
+                    <a
+                      href={founder.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center justify-center w-10 h-10 bg-white/20 backdrop-blur-md border border-white/30 dark:bg-white/10 dark:border-white/20 hover:bg-[#0077b5] hover:border-[#0077b5] hover:text-white text-white rounded-lg transition-all duration-300"
+                    >
+                      <Linkedin size={18} />
+                    </a>
+                  )}
                 </div>
-              </motion.div>
+              </div>
             </Reveal>
           ))}
         </div>
@@ -278,10 +278,14 @@ const Founders = () => {
                       </p>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar text-gray-600 dark:text-gray-300 leading-relaxed text-sm md:text-base space-y-4">
-                      {selectedFounder.bio.split("\n").map((paragraph, idx) => (
-                        <p key={idx}>{paragraph}</p>
-                      ))}
+                    <div className="flex-1 relative overflow-hidden">
+                      <div className="h-full overflow-y-auto pr-2 text-gray-600 dark:text-gray-300 leading-relaxed text-sm md:text-base space-y-4 custom-scrollbar">
+                        {selectedFounder.bio.split("\n").map((paragraph, idx) => (
+                          <p key={idx}>{paragraph}</p>
+                        ))}
+                      </div>
+                      {/* Fade efekti - Yazının devamı varsa görünür */}
+                      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white dark:from-slate-900 to-transparent pointer-events-none"></div>
                     </div>
 
                     <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-800 shrink-0">
