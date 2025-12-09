@@ -31,7 +31,7 @@ const Sidebar = ({ activeTab, setActiveTab, onClose }) => {
         <div className="mb-4 pb-4 border-b border-gray-100 dark:border-slate-700">
            <TabButton id="inbox" icon={Inbox} label="Inbox (Messages)" />
         </div>
-        <TabButton id="hero" icon={Layout} label="Hero Section" />
+        <TabButton id="hero" icon={Layout} label="Introduction" />
         <TabButton id="services" icon={Briefcase} label="Services" />
         <TabButton id="about" icon={Type} label="About Us" />
         <TabButton id="founders" icon={Users} label="Leadership" />

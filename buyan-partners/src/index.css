@@ -21,6 +21,9 @@ html {
   /* 2. Navbar sabit olduğu için başlıkların altında kalmasını engeller */
   /* Navbar yüksekliğine göre (yaklaşık 100px) bir boşluk bırakır */
   scroll-padding-top: 100px;
+  overflow-x: hidden; /* Yatay taşmayı engelle */
+  width: 100%;        /* Genişliği ekrana sabitle */
+  position: relative;
 }
 
 /* Custom Scrollbar (İsteğe bağlı, şık durur) */
