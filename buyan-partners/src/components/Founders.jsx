@@ -172,7 +172,7 @@ const Founders = () => {
                       setDirection(0);
                       setSelectedId(founder.id);
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 dark:bg-white/10 dark:border-white/20 hover:bg-white hover:text-black dark:hover:bg-white dark:hover:text-black text-white py-2.5 px-4 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300"
+                    className="flex-1 flex items-center justify-center gap-2 bg-black dark:bg-white/10 dark:border dark:border-white/20 hover:bg-gray-900 dark:hover:bg-white/20 text-white dark:text-white py-2.5 px-4 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300"
                   >
                     <span>Learn More</span>
                     <ArrowRight size={14} />
@@ -183,7 +183,7 @@ const Founders = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="flex items-center justify-center w-10 h-10 bg-white/20 backdrop-blur-md border border-white/30 dark:bg-white/10 dark:border-white/20 hover:bg-[#0077b5] hover:border-[#0077b5] hover:text-white text-white rounded-lg transition-all duration-300"
+                      className="flex items-center justify-center w-10 h-10 bg-black dark:bg-white/10 dark:border dark:border-white/20 hover:bg-gray-900 dark:hover:bg-white/20 text-white rounded-lg transition-all duration-300"
                     >
                       <Linkedin size={18} />
                     </a>

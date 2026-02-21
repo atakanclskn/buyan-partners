@@ -1,11 +1,11 @@
 import { useSite } from '../context/SiteContext';
 import { 
   Linkedin, Instagram, Facebook, Youtube, Twitter, Github, 
-  Globe, ArrowUp, Send, MessageCircle, Dribbble 
+  Globe, ArrowUp, Send, MessageCircle, Dribbble, Settings, LogOut 
 } from 'lucide-react';
 
 // @atakanclskn - Footer Component
-const Footer = () => {
+const Footer = ({ user, onLoginClick, onAdminPanelClick, onLogout }) => {
   const { config } = useSite();
   const { footer, general } = config;
 
@@ -101,15 +101,47 @@ const Footer = () => {
             {general.footerText}
           </p>
 
-          <button 
-            onClick={scrollToTop}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium group"
-          >
-            {footer.labels?.backToTop || "Back to Top"}
-            <div className="p-1 rounded-full bg-white/10 group-hover:bg-secondary group-hover:text-white transition-all">
-              <ArrowUp size={16} />
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={scrollToTop}
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium group"
+            >
+              {footer.labels?.backToTop || "Back to Top"}
+              <div className="p-1 rounded-full bg-white/10 group-hover:bg-secondary group-hover:text-white transition-all">
+                <ArrowUp size={16} />
+              </div>
+            </button>
+
+            {/* Admin Butonları */}
+            <div className="flex gap-3">
+              {user ? (
+                <>
+                  <button 
+                    onClick={onAdminPanelClick}
+                    className="bg-secondary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform cursor-pointer"
+                    title="Admin Panelini Aç"
+                  >
+                    <Settings size={18} />
+                  </button>
+                  <button 
+                    onClick={onLogout}
+                    className="bg-red-500 text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform cursor-pointer"
+                    title="Çıkış Yap"
+                  >
+                    <LogOut size={18} />
+                  </button>
+                </>
+              ) : (
+                <button 
+                  onClick={onLoginClick}
+                  className="bg-gray-700 text-white p-2 rounded-full shadow-lg opacity-50 hover:opacity-100 transition-opacity cursor-pointer"
+                  title="Yönetici Girişi"
+                >
+                  <Settings size={18} />
+                </button>
+              )}
             </div>
-          </button>
+          </div>
         </div>
 
         {/* Developer Signature - Çok küçük ve altta */}

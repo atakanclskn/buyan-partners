@@ -80,41 +80,14 @@ function App() {
           <About />    
           <Founders /> 
           <Contact />  
-          <Footer /> 
+          <Footer 
+            user={user}
+            onLoginClick={() => setShowLogin(true)}
+            onAdminPanelClick={() => setShowAdminPanel(true)}
+            onLogout={() => signOut(auth)}
+          /> 
 
-          {/* --- ADMIN KONTROLLERİ (Sadece Desktop) --- */}
-          
-          {/* 1. Admin Butonu (Sağ Alt Köşe - Sadece md ve üstü) */}
-          <div className="hidden md:flex fixed bottom-6 right-6 z-50 gap-3">
-            {user ? (
-              // Eğer giriş yapıldıysa: Paneli Aç ve Çıkış Yap butonları
-              <>
-                <button 
-                  onClick={() => setShowAdminPanel(true)}
-                  className="bg-secondary text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform cursor-pointer"
-                  title="Admin Panelini Aç"
-                >
-                  <Settings size={24} className="animate-spin-slow" />
-                </button>
-                <button 
-                  onClick={() => signOut(auth)}
-                  className="bg-red-500 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform cursor-pointer"
-                  title="Çıkış Yap"
-                >
-                  <LogOut size={24} />
-                </button>
-              </>
-            ) : (
-              // Giriş yapılmadıysa: Login butonunu göster (Gizli giriş için)
-              <button 
-                onClick={() => setShowLogin(true)}
-                className="bg-gray-800 text-white p-3 rounded-full shadow-lg opacity-30 hover:opacity-100 transition-opacity cursor-pointer"
-                title="Yönetici Girişi"
-              >
-                <Settings size={20} />
-              </button>
-            )}
-          </div>
+          {/* --- ADMIN KONTROLLERİ (Admin buton artık Footer'da) --- */}
 
           {/* 2. Login Modalı */}
           {showLogin && (
